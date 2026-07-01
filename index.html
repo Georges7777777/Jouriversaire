@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="description" content="Jouriversaire — célébrez vos milliers de jours." />
+<title>Jouriversaire</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+  :root{--serif:'Playfair Display',Georgia,serif;--mono:'DM Mono',ui-monospace,Menlo,monospace;
+    --bg:#f5efe3;--card:#fffdf8;--line:#e7ddca;--ink:#2d2820;--muted:#938974;
+    --gold:#b8893a;--accent:#d4582f;--soft:#fbf6ec;
+    --grad:linear-gradient(135deg,#FBB040,#F2674A,#F0506E);}
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  body{background:var(--bg);color:var(--ink);font-family:var(--mono);line-height:1.5;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+  html[dir=rtl] body{text-align:right;}
+  .wrap{max-width:760px;margin:0 auto;padding:18px 18px 70px;}
+  a{color:var(--accent);}
+
+  header{display:flex;align-items:center;gap:13px;padding:8px 0 4px;flex-wrap:wrap;}
+  .logo{width:46px;height:46px;border-radius:13px;box-shadow:0 6px 18px rgba(242,103,74,.22);display:block;flex:0 0 46px;}
+  .brandtxt{flex:1;}
+  .brandtxt h1{font-family:var(--serif);font-size:23px;font-weight:700;color:var(--ink);line-height:1;}
+  .brandtxt h1 em{font-style:italic;color:var(--accent);}
+  .langsel{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:var(--mono);font-size:12px;color:var(--ink);color-scheme:light;outline:none;cursor:pointer;}
+  .nav{font-size:11px;color:var(--muted);letter-spacing:.04em;cursor:pointer;}
+  .nav:hover{color:var(--accent);}
+
+  .hero{margin:26px 0 8px;}
+  .hero h2{font-family:var(--serif);font-size:clamp(26px,6vw,40px);font-weight:700;color:var(--ink);line-height:1.15;margin-bottom:18px;}
+  .hero h2 em{font-style:italic;color:var(--accent);}
+  .lede{font-size:14px;color:#5e564a;line-height:1.75;margin-bottom:14px;}
+  .lede b{color:var(--ink);font-weight:500;}
+  .copyline{font-size:11px;color:#9a8f78;letter-spacing:.03em;margin-top:16px;border-inline-start:2px solid var(--line);padding-inline-start:12px;}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0;position:relative;overflow:hidden;box-shadow:0 2px 16px rgba(80,55,20,.05);}
+  .card.accent::before{content:'';position:absolute;top:0;left:0;right:0;height:3px;background:var(--grad);}
+  .label{font-size:10px;letter-spacing:.2em;color:var(--muted);text-transform:uppercase;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;}
+
+  label.fld{display:block;font-size:10px;letter-spacing:.16em;color:var(--muted);text-transform:uppercase;margin:0 0 8px;}
+  input.in,select.in{width:100%;background:var(--soft);border:1px solid var(--line);border-radius:9px;padding:13px 15px;
+    font-family:var(--mono);font-size:16px;color:var(--ink);outline:none;transition:border-color .2s;color-scheme:light;-webkit-appearance:none;appearance:none;}
+  input.in:focus,select.in:focus{border-color:var(--accent);}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;border:none;border-radius:11px;
+    padding:13px 16px;font-family:var(--mono);font-size:13px;letter-spacing:.04em;transition:transform .12s,filter .2s;width:100%;}
+  .btn:active{transform:scale(.98);}
+  .btn-primary{background:var(--grad);color:#fff;font-weight:500;}
+  .btn-ghost{background:var(--soft);border:1px solid var(--line);color:#6a6253;}
+  .btn-danger{background:#fbeeea;border:1px solid #eccabd;color:#b5482c;}
+  .btn-row{display:flex;gap:10px;}
+
+  .results{display:none;}
+  .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
+  .stat{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px 15px;}
+  .stat-l{font-size:9px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
+  .stat-v{font-family:var(--serif);font-size:27px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-1px;}
+  .stat.lead{grid-column:1/-1;}.stat.lead .stat-v{font-size:42px;color:var(--accent);}
+  .age-line{font-family:var(--serif);font-size:15px;color:#5e564a;margin:4px 0 14px;}.age-line b{color:var(--accent);}
+
+  .next{display:flex;gap:14px;align-items:center;background:linear-gradient(135deg,#fdf2e6,#fce9dd);border:1px solid #f1d8c4;border-radius:12px;padding:16px;margin-top:12px;}
+  .next .big{font-family:var(--serif);font-size:30px;color:var(--accent);line-height:1;}
+  .next .lbl{font-size:11px;color:#9a6a45;letter-spacing:.04em;text-transform:uppercase;}
+  .next .sub{font-size:11px;color:#7a6e5c;margin-top:4px;}
+  .next2{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px;}
+  .next2 .cell{background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:12px;}
+  .next2 .cell .t{font-family:var(--serif);font-size:17px;color:var(--ink);}
+  .next2 .cell .s{font-size:10px;color:var(--muted);margin-top:4px;}
+
+  .anec{background:linear-gradient(135deg,#fbf4e6,#f9efdf);border:1px solid #efe0c6;border-radius:12px;padding:16px;margin-top:12px;}
+  .anec .label{margin-bottom:8px;}
+  .anec-txt{font-family:var(--serif);font-style:italic;font-size:14px;line-height:1.6;color:#5a5142;}
+
+  .item{display:flex;align-items:center;gap:13px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
+  .item:hover{border-color:#e0b48f;}
+  .ava{width:40px;height:40px;border-radius:50%;flex:0 0 40px;display:flex;align-items:center;justify-content:center;font-size:19px;background:#fff;border:1px solid var(--line);}
+  .it-name{font-family:var(--serif);font-size:17px;color:var(--ink);}
+  .it-sub{font-size:10px;color:var(--muted);margin-top:2px;}
+  .it-days{margin-inline-start:auto;text-align:end;}
+  .it-days b{font-family:var(--serif);font-size:20px;color:var(--gold);}
+  .it-days span{display:block;font-size:8px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;}
+  .del-x{margin-inline-start:4px;color:#bcae93;padding:4px 6px;}.del-x:hover{color:var(--accent);}
+
+  .tabs{display:flex;gap:8px;margin-bottom:16px;}
+  .tab{flex:1;text-align:center;padding:10px;border-radius:9px;font-size:12px;letter-spacing:.05em;cursor:pointer;background:var(--soft);border:1px solid var(--line);color:var(--muted);}
+  .tab.active{background:#fdeede;border-color:#eccbb3;color:var(--accent);}
+  .msg{font-size:12px;line-height:1.6;margin-top:12px;padding:11px 13px;border-radius:9px;display:none;}
+  .msg.show{display:block;}
+  .msg.ok{background:#eef7ee;border:1px solid #cfe6cf;color:#3f7a45;}
+  .msg.err{background:#fbeeea;border:1px solid #eccabd;color:#b5482c;}
+  .msg.info{background:#f8f2e6;border:1px solid #ecdcbf;color:#7a6a48;}
+
+  .who{font-size:11px;color:var(--muted);}.who b{color:var(--accent);}
+  .legal{font-size:11px;color:#6e6556;line-height:1.7;}
+  .legal h4{font-family:var(--serif);font-size:14px;color:var(--ink);margin:14px 0 6px;font-style:italic;}
+  .foot{font-size:10px;color:#a99e86;letter-spacing:.05em;text-align:center;margin-top:30px;line-height:1.8;}
+  .hidden{display:none!important;}
+  .pill{display:inline-block;font-size:9px;letter-spacing:.06em;color:#fff;background:var(--grad);padding:2px 8px;border-radius:20px;text-transform:uppercase;vertical-align:middle;margin-inline-start:6px;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <span id="logo-slot"></span>
+    <div class="brandtxt"><h1><em>Jouri</em>versaire</h1></div>
+    <select class="langsel" id="lang-sel" aria-label="Langue"></select>
+    <span class="nav" id="nav-account">Mon compte ›</span>
+  </header>
+
+  <section id="view-home">
+    <div class="hero">
+      <h2 id="hero-title"></h2>
+      <p class="lede" id="lede1"></p>
+      <p class="lede" id="lede2"></p>
+      <p class="copyline" id="copyline"></p>
+    </div>
+
+    <div class="card accent">
+      <div class="label" id="lbl-calc"></div>
+      <div class="row2">
+        <div><label class="fld" id="lbl-date" for="c-date"></label><input class="in" id="c-date" type="date" /></div>
+        <div><label class="fld" id="lbl-time" for="c-time"></label><input class="in" id="c-time" type="time" /></div>
+      </div>
+      <div class="results" id="results">
+        <div class="age-line" id="r-age"></div>
+        <div class="next" id="r-next"></div>
+        <div class="next2" id="r-next2"></div>
+        <div class="grid" id="r-grid"></div>
+        <div class="anec">
+          <div class="label"><span id="lbl-anec"></span> <span class="nav" id="anec-refresh" style="font-size:10px">↻</span></div>
+          <div class="anec-txt" id="anec-txt">…</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card" id="cta-card">
+      <div class="label" id="lbl-keep"></div>
+      <p class="lede" id="txt-keep" style="margin-bottom:14px;font-size:13px"></p>
+      <button class="btn btn-primary" id="cta-account"></button>
+    </div>
+  </section>
+
+  <section id="view-account" class="hidden">
+    <span class="nav" id="back-home"></span>
+    <div id="auth-block" class="card accent" style="margin-top:14px">
+      <div class="tabs">
+        <div class="tab active" id="tab-login"></div>
+        <div class="tab" id="tab-signup"></div>
+      </div>
+      <label class="fld" id="lbl-email" for="a-email"></label>
+      <input class="in" id="a-email" type="email" autocomplete="email" style="margin-bottom:14px" placeholder="you@mail.com" />
+      <label class="fld" id="lbl-pass" for="a-pass"></label>
+      <input class="in" id="a-pass" type="password" autocomplete="current-password" style="margin-bottom:16px" placeholder="••••••••" />
+      <button class="btn btn-primary" id="a-submit"></button>
+      <div style="text-align:center;margin-top:12px"><span class="nav" id="a-forgot" style="font-size:11px"></span></div>
+      <div class="msg" id="a-msg"></div>
+      <div class="legal" id="consent" style="margin-top:14px;display:none"></div>
+    </div>
+
+    <div id="app-block" class="hidden">
+      <div class="card" style="margin-top:14px">
+        <div class="who"><span id="who-label"></span> <b id="who-email"></b> <span class="nav" id="a-logout" style="float:right"></span></div>
+      </div>
+      <div class="card accent">
+        <div class="label" id="lbl-add"></div>
+        <label class="fld" id="lbl-dlabel" for="d-name"></label>
+        <input class="in" id="d-name" style="margin-bottom:12px" />
+        <label class="fld" id="lbl-dtype" for="d-type"></label>
+        <select class="in" id="d-type" style="margin-bottom:12px">
+          <option value="naissance" id="opt-naissance"></option><option value="mariage" id="opt-mariage"></option>
+          <option value="rencontre" id="opt-rencontre"></option><option value="autre" id="opt-autre"></option>
+        </select>
+        <div class="row2" style="margin-bottom:14px">
+          <div><label class="fld" id="lbl-ddate" for="d-date"></label><input class="in" id="d-date" type="date" /></div>
+          <div><label class="fld" id="lbl-dtime" for="d-time"></label><input class="in" id="d-time" type="time" /></div>
+        </div>
+        <button class="btn btn-primary" id="d-add"></button>
+        <div class="msg" id="d-msg"></div>
+      </div>
+      <div class="card">
+        <div class="label" id="lbl-mydates"></div>
+        <div id="d-list"></div>
+        <div id="d-empty" class="legal" style="text-align:center;padding:16px 0;font-style:italic"></div>
+      </div>
+      <div class="card">
+        <div class="label"><span id="lbl-mydata"></span> <span class="pill">RGPD</span></div>
+        <p class="legal" id="rgpd-desc" style="margin-bottom:14px"></p>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="rgpd-export"></button>
+          <button class="btn btn-danger" id="rgpd-delete"></button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="view-legal" class="hidden">
+    <span class="nav" id="back-home2"></span>
+    <div class="card" style="margin-top:14px"><div class="legal" id="legal-body"></div></div>
+  </section>
+
+  <div class="foot">
+    <span id="foot-tag"></span><br>© 2026 Georges Viana · <span class="nav" id="foot-legal"></span>
+  </div>
+</div>
+
+<script>
+"use strict";
+(function(){
+try{
+
+/* ===== CONFIGURATION — À REMPLIR AVANT DÉPLOIEMENT ===== */
+const SUPABASE_URL  = 'https://lpdbgndggutgqwnxgqtv.supabase.co';
+const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxwZGJnbmRnZ3V0Z3F3bnhncXR2Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2OTQ3NjksImV4cCI6MjA5ODI3MDc2OX0.ty82uHZgalFubWjn8-mU-SG7KvyhDqOQMT5LVLMFv9c';
+/* ====================================================== */
+
+const I18N={
+ fr:{lang:'Français',navAccount:'Mon compte ›',heroT:'Et si vous comptiez vos jours,|pas seulement vos années&nbsp;?',
+  lede1:'Un <b>jouriversaire</b>, c\u2019est le jour où votre compteur de jours franchit un palier rond&nbsp;: 10\u202f000 jours, 20\u202f000 jours, 25\u202f000 jours…',
+  lede2:'Ces milliers de jours sont <b>plus rares</b> et surtout <b>imprévisibles</b>&nbsp;: contrairement à votre anniversaire, toujours à la même saison, un jouriversaire peut tomber en plein été, le suivant en plein hiver. Chacun est une vraie surprise — une occasion de célébrer là où on ne l\u2019attend pas.',
+  copy:'« Jouriversaire » — concept et terme créés par Georges Viana. © 2026 Georges Viana. Tous droits réservés.',
+  calc:'Calculez vos jouriversaires',fDate:'Date',fTime:'Heure (facultatif)',
+  lifeTpl:'<b>{y}</b> ans · <b>{m}</b> mois · <b>{d}</b> jours de vie',nextLabel:'Prochain jouriversaire',daysWord:'jours',
+  nextSub:'le {date} · dans {n} jours',uJours:'Jours',uSemaines:'Semaines',uMois:'Mois',uAnnees:'Années',uHeures:'Heures',uMinutes:'Minutes',uSecondes:'Secondes',
+  anecLabel:'Anecdote du jour',anecTpl:'En {year} : {text}',anecLoad:'Recherche d\u2019une anecdote…',anecNone:'Pas d\u2019anecdote pour cette date.',anecErr:'Anecdote indisponible pour le moment.',
+  keep:'Gardez vos dates',keepDesc:'Créez un compte gratuit pour <b>sauvegarder vos dates et celles de votre famille</b> et les retrouver à chaque connexion, sur tous vos appareils.',createAcc:'Créer un compte gratuit',
+  backCalc:'‹ Retour au calculateur',tabLogin:'Connexion',tabSignup:'Inscription',fEmail:'Email',fPass:'Mot de passe',btnLogin:'Se connecter',btnSignup:'Créer mon compte',forgot:'Mot de passe oublié&nbsp;?',
+  consent:'En créant un compte, vous acceptez que votre email et vos dates soient conservés pour vous fournir le service (voir {link}).',consentLink:'confidentialité',
+  connected:'Connecté&nbsp;:',logout:'Déconnexion',addDate:'Ajouter une date',dLabel:'Libellé',dLabelPh:'Mariage, Naissance de Tristan…',dType:'Type',
+  tNaissance:'🎂 Naissance',tMariage:'💍 Mariage',tRencontre:'❤️ Rencontre',tAutre:'✦ Autre',save:'＋ Enregistrer',myDates:'Mes dates',noDates:'Aucune date enregistrée pour l\u2019instant.',
+  myData:'Mes données',rgpdDesc:'Vous pouvez à tout moment exporter vos données ou supprimer définitivement votre compte et toutes vos dates.',exportData:'⬆ Exporter mes données',deleteAcc:'Supprimer mon compte',
+  back:'‹ Retour',footTag:'Jouriversaire — célébrez vos milliers de jours.',footLegal:'Mentions légales & confidentialité',
+  mPreview:'Les comptes seront actifs une fois le site déployé avec votre projet Supabase. Le calculateur fonctionne dès maintenant.',mFields:'Email et mot de passe requis.',mInvalid:'Identifiants incorrects.',
+  mCreated:'Compte créé ! Vérifiez votre boîte mail et cliquez sur le lien de confirmation.',mReset:'Email de réinitialisation envoyé.',mFieldsReq:'Libellé et date requis.',mEmailFirst:'Saisissez d\u2019abord votre email.',
+  cDelDate:'Supprimer « {l} » ?',cDelAcc:'Supprimer DÉFINITIVEMENT votre compte et toutes vos dates ? Action irréversible.',accDeleted:'Votre compte et vos données ont été supprimés.',newPass:'Choisissez un nouveau mot de passe :',passUpd:'Mot de passe mis à jour.',
+  legal:'<h4>Mentions légales & confidentialité</h4><p><b>Éditeur :</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Hébergement :</b> GitHub Pages ; comptes et base sur Supabase (région UE).</p><h4>Données</h4><p>Sans compte : aucune donnée enregistrée. Avec compte : votre email et vos dates (libellé, type, date/heure), uniquement pour vous fournir le service de sauvegarde.</p><h4>Vos droits</h4><p>Accès, rectification, portabilité (export) et effacement depuis « Mes données ». Base légale : consentement et exécution du service.</p><p>« Jouriversaire » — concept et terme créés par Georges Viana. © 2026.</p>'},
+ en:{lang:'English',navAccount:'My account ›',heroT:'What if you counted your days,|not just your years?',
+  lede1:'A <b>jouriversaire</b> is the day your day-counter crosses a round milestone: 10,000 days, 20,000 days, 25,000 days…',
+  lede2:'These thousands of days are <b>rarer</b> and above all <b>unpredictable</b>: unlike your birthday, always in the same season, one jouriversaire can fall in midsummer, the next in deep winter. Each one is a real surprise — a chance to celebrate where you least expect it.',
+  copy:'"Jouriversaire" — concept and term created by Georges Viana. © 2026 Georges Viana. All rights reserved.',
+  calc:'Calculate your jouriversaires',fDate:'Date',fTime:'Time (optional)',
+  lifeTpl:'<b>{y}</b> years · <b>{m}</b> months · <b>{d}</b> days of life',nextLabel:'Next jouriversaire',daysWord:'days',
+  nextSub:'on {date} · in {n} days',uJours:'Days',uSemaines:'Weeks',uMois:'Months',uAnnees:'Years',uHeures:'Hours',uMinutes:'Minutes',uSecondes:'Seconds',
+  anecLabel:'On this day',anecTpl:'In {year}: {text}',anecLoad:'Looking for a fact…',anecNone:'No fact for this date.',anecErr:'Fact unavailable right now.',
+  keep:'Keep your dates',keepDesc:'Create a free account to <b>save your dates and your family\u2019s</b> and find them again at every login, on all your devices.',createAcc:'Create a free account',
+  backCalc:'‹ Back to calculator',tabLogin:'Log in',tabSignup:'Sign up',fEmail:'Email',fPass:'Password',btnLogin:'Log in',btnSignup:'Create my account',forgot:'Forgot password?',
+  consent:'By creating an account, you agree that your email and dates are stored to provide the service (see {link}).',consentLink:'privacy',
+  connected:'Signed in:',logout:'Log out',addDate:'Add a date',dLabel:'Label',dLabelPh:'Wedding, Tristan\u2019s birth…',dType:'Type',
+  tNaissance:'🎂 Birth',tMariage:'💍 Wedding',tRencontre:'❤️ Meeting',tAutre:'✦ Other',save:'＋ Save',myDates:'My dates',noDates:'No date saved yet.',
+  myData:'My data',rgpdDesc:'You may export your data or permanently delete your account and all your dates at any time.',exportData:'⬆ Export my data',deleteAcc:'Delete my account',
+  back:'‹ Back',footTag:'Jouriversaire — celebrate your thousands of days.',footLegal:'Legal & privacy',
+  mPreview:'Accounts will work once the site is deployed with your Supabase project. The calculator works now.',mFields:'Email and password required.',mInvalid:'Invalid credentials.',
+  mCreated:'Account created! Check your inbox and click the confirmation link.',mReset:'Reset email sent.',mFieldsReq:'Label and date required.',mEmailFirst:'Enter your email first.',
+  cDelDate:'Delete "{l}"?',cDelAcc:'PERMANENTLY delete your account and all your dates? This cannot be undone.',accDeleted:'Your account and data have been deleted.',newPass:'Choose a new password:',passUpd:'Password updated.',
+  legal:'<h4>Legal & privacy</h4><p><b>Publisher:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Hosting:</b> GitHub Pages; accounts and database on Supabase (EU region).</p><h4>Data</h4><p>Without an account: nothing is stored. With an account: your email and dates (label, type, date/time), solely to provide the saving service.</p><h4>Your rights</h4><p>Access, rectification, portability (export) and erasure from "My data". Legal basis: consent and performance of the service.</p><p>"Jouriversaire" — concept and term created by Georges Viana. © 2026.</p>'},
+ es:{lang:'Español',navAccount:'Mi cuenta ›',heroT:'¿Y si contaras tus días,|no solo tus años?',
+  lede1:'Un <b>jouriversaire</b> es el día en que tu contador de días cruza una cifra redonda: 10.000 días, 20.000 días, 25.000 días…',
+  lede2:'Esos miles de días son <b>más raros</b> y sobre todo <b>imprevisibles</b>: a diferencia de tu cumpleaños, siempre en la misma estación, un jouriversaire puede caer en pleno verano y el siguiente en pleno invierno. Cada uno es una verdadera sorpresa, una ocasión para celebrar donde menos lo esperas.',
+  copy:'«Jouriversaire» — concepto y término creados por Georges Viana. © 2026 Georges Viana. Todos los derechos reservados.',
+  calc:'Calcula tus jouriversaires',fDate:'Fecha',fTime:'Hora (opcional)',
+  lifeTpl:'<b>{y}</b> años · <b>{m}</b> meses · <b>{d}</b> días de vida',nextLabel:'Próximo jouriversaire',daysWord:'días',
+  nextSub:'el {date} · en {n} días',uJours:'Días',uSemaines:'Semanas',uMois:'Meses',uAnnees:'Años',uHeures:'Horas',uMinutes:'Minutos',uSecondes:'Segundos',
+  anecLabel:'Tal día como hoy',anecTpl:'En {year}: {text}',anecLoad:'Buscando un dato…',anecNone:'Sin dato para esta fecha.',anecErr:'Dato no disponible ahora.',
+  keep:'Guarda tus fechas',keepDesc:'Crea una cuenta gratuita para <b>guardar tus fechas y las de tu familia</b> y recuperarlas en cada inicio de sesión, en todos tus dispositivos.',createAcc:'Crear una cuenta gratuita',
+  backCalc:'‹ Volver a la calculadora',tabLogin:'Iniciar sesión',tabSignup:'Registrarse',fEmail:'Email',fPass:'Contraseña',btnLogin:'Iniciar sesión',btnSignup:'Crear mi cuenta',forgot:'¿Olvidaste tu contraseña?',
+  consent:'Al crear una cuenta, aceptas que tu email y tus fechas se guarden para ofrecerte el servicio (ver {link}).',consentLink:'privacidad',
+  connected:'Conectado:',logout:'Cerrar sesión',addDate:'Añadir una fecha',dLabel:'Etiqueta',dLabelPh:'Boda, Nacimiento de Tristan…',dType:'Tipo',
+  tNaissance:'🎂 Nacimiento',tMariage:'💍 Boda',tRencontre:'❤️ Encuentro',tAutre:'✦ Otro',save:'＋ Guardar',myDates:'Mis fechas',noDates:'Aún no hay fechas guardadas.',
+  myData:'Mis datos',rgpdDesc:'Puedes exportar tus datos o eliminar definitivamente tu cuenta y todas tus fechas en cualquier momento.',exportData:'⬆ Exportar mis datos',deleteAcc:'Eliminar mi cuenta',
+  back:'‹ Volver',footTag:'Jouriversaire — celebra tus miles de días.',footLegal:'Aviso legal y privacidad',
+  mPreview:'Las cuentas funcionarán cuando el sitio se despliegue con tu proyecto Supabase. La calculadora ya funciona.',mFields:'Email y contraseña obligatorios.',mInvalid:'Credenciales incorrectas.',
+  mCreated:'¡Cuenta creada! Revisa tu correo y haz clic en el enlace de confirmación.',mReset:'Email de restablecimiento enviado.',mFieldsReq:'Etiqueta y fecha obligatorias.',mEmailFirst:'Escribe primero tu email.',
+  cDelDate:'¿Eliminar «{l}»?',cDelAcc:'¿Eliminar DEFINITIVAMENTE tu cuenta y todas tus fechas? Acción irreversible.',accDeleted:'Tu cuenta y tus datos han sido eliminados.',newPass:'Elige una nueva contraseña:',passUpd:'Contraseña actualizada.',
+  legal:'<h4>Aviso legal y privacidad</h4><p><b>Editor:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Alojamiento:</b> GitHub Pages; cuentas y base de datos en Supabase (región UE).</p><h4>Datos</h4><p>Sin cuenta: no se guarda nada. Con cuenta: tu email y tus fechas, solo para el servicio de guardado.</p><h4>Tus derechos</h4><p>Acceso, rectificación, portabilidad (exportación) y supresión desde «Mis datos». Base legal: consentimiento y ejecución del servicio.</p><p>«Jouriversaire» — concepto y término creados por Georges Viana. © 2026.</p>'},
+ pt:{lang:'Português',navAccount:'Minha conta ›',heroT:'E se você contasse os seus dias,|não apenas os seus anos?',
+  lede1:'Um <b>jouriversaire</b> é o dia em que o seu contador de dias atinge um marco redondo: 10.000 dias, 20.000 dias, 25.000 dias…',
+  lede2:'Esses milhares de dias são <b>mais raros</b> e sobretudo <b>imprevisíveis</b>: ao contrário do seu aniversário, sempre na mesma estação, um jouriversaire pode cair em pleno verão e o seguinte em pleno inverno. Cada um é uma verdadeira surpresa — uma ocasião para celebrar onde menos se espera.',
+  copy:'«Jouriversaire» — conceito e termo criados por Georges Viana. © 2026 Georges Viana. Todos os direitos reservados.',
+  calc:'Calcule os seus jouriversaires',fDate:'Data',fTime:'Hora (opcional)',
+  lifeTpl:'<b>{y}</b> anos · <b>{m}</b> meses · <b>{d}</b> dias de vida',nextLabel:'Próximo jouriversaire',daysWord:'dias',
+  nextSub:'em {date} · daqui a {n} dias',uJours:'Dias',uSemaines:'Semanas',uMois:'Meses',uAnnees:'Anos',uHeures:'Horas',uMinutes:'Minutos',uSecondes:'Segundos',
+  anecLabel:'Neste dia',anecTpl:'Em {year}: {text}',anecLoad:'Procurando um facto…',anecNone:'Sem facto para esta data.',anecErr:'Facto indisponível de momento.',
+  keep:'Guarde as suas datas',keepDesc:'Crie uma conta gratuita para <b>guardar as suas datas e as da sua família</b> e encontrá-las a cada início de sessão, em todos os seus dispositivos.',createAcc:'Criar uma conta gratuita',
+  backCalc:'‹ Voltar à calculadora',tabLogin:'Entrar',tabSignup:'Registar',fEmail:'Email',fPass:'Palavra-passe',btnLogin:'Entrar',btnSignup:'Criar a minha conta',forgot:'Esqueceu a palavra-passe?',
+  consent:'Ao criar uma conta, aceita que o seu email e as suas datas sejam guardados para lhe prestar o serviço (ver {link}).',consentLink:'privacidade',
+  connected:'Ligado:',logout:'Sair',addDate:'Adicionar uma data',dLabel:'Rótulo',dLabelPh:'Casamento, Nascimento do Tristan…',dType:'Tipo',
+  tNaissance:'🎂 Nascimento',tMariage:'💍 Casamento',tRencontre:'❤️ Encontro',tAutre:'✦ Outro',save:'＋ Guardar',myDates:'As minhas datas',noDates:'Ainda não há datas guardadas.',
+  myData:'Os meus dados',rgpdDesc:'Pode exportar os seus dados ou eliminar definitivamente a sua conta e todas as suas datas a qualquer momento.',exportData:'⬆ Exportar os meus dados',deleteAcc:'Eliminar a minha conta',
+  back:'‹ Voltar',footTag:'Jouriversaire — celebre os seus milhares de dias.',footLegal:'Informação legal e privacidade',
+  mPreview:'As contas funcionarão quando o site for publicado com o seu projeto Supabase. A calculadora já funciona.',mFields:'Email e palavra-passe obrigatórios.',mInvalid:'Credenciais incorretas.',
+  mCreated:'Conta criada! Verifique o seu email e clique no link de confirmação.',mReset:'Email de redefinição enviado.',mFieldsReq:'Rótulo e data obrigatórios.',mEmailFirst:'Introduza primeiro o seu email.',
+  cDelDate:'Eliminar «{l}»?',cDelAcc:'Eliminar DEFINITIVAMENTE a sua conta e todas as suas datas? Ação irreversível.',accDeleted:'A sua conta e os seus dados foram eliminados.',newPass:'Escolha uma nova palavra-passe:',passUpd:'Palavra-passe atualizada.',
+  legal:'<h4>Informação legal e privacidade</h4><p><b>Editor:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Alojamento:</b> GitHub Pages; contas e base de dados no Supabase (região UE).</p><h4>Dados</h4><p>Sem conta: nada é guardado. Com conta: o seu email e as suas datas, apenas para o serviço de guardado.</p><h4>Os seus direitos</h4><p>Acesso, retificação, portabilidade (exportação) e eliminação a partir de «Os meus dados». Base legal: consentimento e execução do serviço.</p><p>«Jouriversaire» — conceito e termo criados por Georges Viana. © 2026.</p>'},
+ pl:{lang:'Polski',navAccount:'Moje konto ›',heroT:'A gdybyś liczył swoje dni,|a nie tylko lata?',
+  lede1:'<b>Jouriversaire</b> to dzień, w którym licznik twoich dni osiąga okrągłą wartość: 10 000 dni, 20 000 dni, 25 000 dni…',
+  lede2:'Te tysiące dni są <b>rzadsze</b>, a przede wszystkim <b>nieprzewidywalne</b>: w przeciwieństwie do urodzin, zawsze o tej samej porze roku, jeden jouriversaire może wypaść w środku lata, kolejny w środku zimy. Każdy to prawdziwa niespodzianka — okazja do świętowania tam, gdzie się tego nie spodziewasz.',
+  copy:'„Jouriversaire" — koncept i termin stworzone przez Georges\u2019a Vianę. © 2026 Georges Viana. Wszelkie prawa zastrzeżone.',
+  calc:'Oblicz swoje jouriversaire',fDate:'Data',fTime:'Godzina (opcjonalnie)',
+  lifeTpl:'<b>{y}</b> lat · <b>{m}</b> mies. · <b>{d}</b> dni życia',nextLabel:'Następny jouriversaire',daysWord:'dni',
+  nextSub:'{date} · za {n} dni',uJours:'Dni',uSemaines:'Tygodnie',uMois:'Miesiące',uAnnees:'Lata',uHeures:'Godziny',uMinutes:'Minuty',uSecondes:'Sekundy',
+  anecLabel:'Tego dnia',anecTpl:'W {year}: {text}',anecLoad:'Szukam ciekawostki…',anecNone:'Brak ciekawostki dla tej daty.',anecErr:'Ciekawostka chwilowo niedostępna.',
+  keep:'Zapisz swoje daty',keepDesc:'Załóż darmowe konto, aby <b>zapisać swoje daty i daty rodziny</b> i odnajdywać je przy każdym logowaniu, na wszystkich urządzeniach.',createAcc:'Załóż darmowe konto',
+  backCalc:'‹ Powrót do kalkulatora',tabLogin:'Zaloguj się',tabSignup:'Zarejestruj się',fEmail:'Email',fPass:'Hasło',btnLogin:'Zaloguj się',btnSignup:'Załóż konto',forgot:'Nie pamiętasz hasła?',
+  consent:'Zakładając konto, akceptujesz przechowywanie twojego emaila i dat w celu świadczenia usługi (zob. {link}).',consentLink:'prywatność',
+  connected:'Zalogowano:',logout:'Wyloguj',addDate:'Dodaj datę',dLabel:'Etykieta',dLabelPh:'Ślub, Narodziny Tristana…',dType:'Typ',
+  tNaissance:'🎂 Narodziny',tMariage:'💍 Ślub',tRencontre:'❤️ Spotkanie',tAutre:'✦ Inne',save:'＋ Zapisz',myDates:'Moje daty',noDates:'Brak zapisanych dat.',
+  myData:'Moje dane',rgpdDesc:'W każdej chwili możesz wyeksportować dane lub trwale usunąć konto i wszystkie daty.',exportData:'⬆ Eksportuj dane',deleteAcc:'Usuń konto',
+  back:'‹ Powrót',footTag:'Jouriversaire — świętuj swoje tysiące dni.',footLegal:'Informacje prawne i prywatność',
+  mPreview:'Konta zadziałają po wdrożeniu strony z twoim projektem Supabase. Kalkulator działa już teraz.',mFields:'Email i hasło wymagane.',mInvalid:'Nieprawidłowe dane.',
+  mCreated:'Konto utworzone! Sprawdź skrzynkę i kliknij link potwierdzający.',mReset:'Wysłano email resetujący.',mFieldsReq:'Etykieta i data wymagane.',mEmailFirst:'Najpierw wpisz email.',
+  cDelDate:'Usunąć „{l}"?',cDelAcc:'Trwale usunąć konto i wszystkie daty? Tej operacji nie można cofnąć.',accDeleted:'Konto i dane zostały usunięte.',newPass:'Wybierz nowe hasło:',passUpd:'Hasło zaktualizowane.',
+  legal:'<h4>Informacje prawne i prywatność</h4><p><b>Wydawca:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Hosting:</b> GitHub Pages; konta i baza w Supabase (region UE).</p><h4>Dane</h4><p>Bez konta: nic nie jest zapisywane. Z kontem: email i daty, wyłącznie w celu zapisu.</p><h4>Twoje prawa</h4><p>Dostęp, sprostowanie, przenoszenie (eksport) i usunięcie w „Moje dane". Podstawa prawna: zgoda i wykonanie usługi.</p><p>„Jouriversaire" — koncept i termin stworzone przez Georges\u2019a Vianę. © 2026.</p>'},
+ de:{lang:'Deutsch',navAccount:'Mein Konto ›',heroT:'Was, wenn du deine Tage zählst,|nicht nur deine Jahre?',
+  lede1:'Ein <b>Jouriversaire</b> ist der Tag, an dem dein Tageszähler eine runde Marke überschreitet: 10.000 Tage, 20.000 Tage, 25.000 Tage…',
+  lede2:'Diese Tausenden von Tagen sind <b>seltener</b> und vor allem <b>unvorhersehbar</b>: Anders als dein Geburtstag, immer zur selben Jahreszeit, kann ein Jouriversaire mitten im Sommer fallen, das nächste mitten im Winter. Jedes ist eine echte Überraschung — ein Anlass zu feiern, wo man es nicht erwartet.',
+  copy:'„Jouriversaire" — Konzept und Begriff von Georges Viana. © 2026 Georges Viana. Alle Rechte vorbehalten.',
+  calc:'Berechne deine Jouriversaires',fDate:'Datum',fTime:'Uhrzeit (optional)',
+  lifeTpl:'<b>{y}</b> Jahre · <b>{m}</b> Monate · <b>{d}</b> Tage Leben',nextLabel:'Nächstes Jouriversaire',daysWord:'Tage',
+  nextSub:'am {date} · in {n} Tagen',uJours:'Tage',uSemaines:'Wochen',uMois:'Monate',uAnnees:'Jahre',uHeures:'Stunden',uMinutes:'Minuten',uSecondes:'Sekunden',
+  anecLabel:'An diesem Tag',anecTpl:'{year}: {text}',anecLoad:'Suche eine Tatsache…',anecNone:'Keine Tatsache für dieses Datum.',anecErr:'Tatsache derzeit nicht verfügbar.',
+  keep:'Speichere deine Daten',keepDesc:'Erstelle ein kostenloses Konto, um <b>deine Daten und die deiner Familie zu speichern</b> und bei jedem Login auf allen Geräten wiederzufinden.',createAcc:'Kostenloses Konto erstellen',
+  backCalc:'‹ Zurück zum Rechner',tabLogin:'Anmelden',tabSignup:'Registrieren',fEmail:'E-Mail',fPass:'Passwort',btnLogin:'Anmelden',btnSignup:'Konto erstellen',forgot:'Passwort vergessen?',
+  consent:'Mit der Kontoerstellung stimmst du zu, dass E-Mail und Daten zur Bereitstellung des Dienstes gespeichert werden (siehe {link}).',consentLink:'Datenschutz',
+  connected:'Angemeldet:',logout:'Abmelden',addDate:'Datum hinzufügen',dLabel:'Bezeichnung',dLabelPh:'Hochzeit, Tristans Geburt…',dType:'Typ',
+  tNaissance:'🎂 Geburt',tMariage:'💍 Hochzeit',tRencontre:'❤️ Begegnung',tAutre:'✦ Andere',save:'＋ Speichern',myDates:'Meine Daten',noDates:'Noch keine Daten gespeichert.',
+  myData:'Meine Daten',rgpdDesc:'Du kannst deine Daten jederzeit exportieren oder dein Konto und alle Daten endgültig löschen.',exportData:'⬆ Daten exportieren',deleteAcc:'Konto löschen',
+  back:'‹ Zurück',footTag:'Jouriversaire — feiere deine Tausenden von Tagen.',footLegal:'Impressum & Datenschutz',
+  mPreview:'Konten funktionieren, sobald die Seite mit deinem Supabase-Projekt veröffentlicht ist. Der Rechner funktioniert bereits.',mFields:'E-Mail und Passwort erforderlich.',mInvalid:'Ungültige Anmeldedaten.',
+  mCreated:'Konto erstellt! Prüfe dein Postfach und klicke den Bestätigungslink.',mReset:'Zurücksetzungs-E-Mail gesendet.',mFieldsReq:'Bezeichnung und Datum erforderlich.',mEmailFirst:'Gib zuerst deine E-Mail ein.',
+  cDelDate:'„{l}" löschen?',cDelAcc:'Konto und alle Daten ENDGÜLTIG löschen? Nicht rückgängig zu machen.',accDeleted:'Konto und Daten wurden gelöscht.',newPass:'Wähle ein neues Passwort:',passUpd:'Passwort aktualisiert.',
+  legal:'<h4>Impressum & Datenschutz</h4><p><b>Anbieter:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Hosting:</b> GitHub Pages; Konten und Datenbank bei Supabase (EU-Region).</p><h4>Daten</h4><p>Ohne Konto: nichts gespeichert. Mit Konto: E-Mail und Daten, nur zur Bereitstellung des Speicherdienstes.</p><h4>Deine Rechte</h4><p>Auskunft, Berichtigung, Portabilität (Export) und Löschung unter „Meine Daten". Rechtsgrundlage: Einwilligung und Vertragserfüllung.</p><p>„Jouriversaire" — Konzept und Begriff von Georges Viana. © 2026.</p>'},
+ it:{lang:'Italiano',navAccount:'Il mio account ›',heroT:'E se contassi i tuoi giorni,|non solo i tuoi anni?',
+  lede1:'Un <b>jouriversaire</b> è il giorno in cui il tuo contatore di giorni supera una soglia tonda: 10.000 giorni, 20.000 giorni, 25.000 giorni…',
+  lede2:'Queste migliaia di giorni sono <b>più rare</b> e soprattutto <b>imprevedibili</b>: a differenza del compleanno, sempre nella stessa stagione, un jouriversaire può cadere in piena estate e il successivo in pieno inverno. Ognuno è una vera sorpresa — un\u2019occasione per festeggiare dove meno te lo aspetti.',
+  copy:'«Jouriversaire» — concetto e termine creati da Georges Viana. © 2026 Georges Viana. Tutti i diritti riservati.',
+  calc:'Calcola i tuoi jouriversaires',fDate:'Data',fTime:'Ora (facoltativa)',
+  lifeTpl:'<b>{y}</b> anni · <b>{m}</b> mesi · <b>{d}</b> giorni di vita',nextLabel:'Prossimo jouriversaire',daysWord:'giorni',
+  nextSub:'il {date} · tra {n} giorni',uJours:'Giorni',uSemaines:'Settimane',uMois:'Mesi',uAnnees:'Anni',uHeures:'Ore',uMinutes:'Minuti',uSecondes:'Secondi',
+  anecLabel:'Accadde oggi',anecTpl:'Nel {year}: {text}',anecLoad:'Cerco una curiosità…',anecNone:'Nessuna curiosità per questa data.',anecErr:'Curiosità non disponibile ora.',
+  keep:'Conserva le tue date',keepDesc:'Crea un account gratuito per <b>salvare le tue date e quelle della tua famiglia</b> e ritrovarle a ogni accesso, su tutti i dispositivi.',createAcc:'Crea un account gratuito',
+  backCalc:'‹ Torna al calcolatore',tabLogin:'Accedi',tabSignup:'Registrati',fEmail:'Email',fPass:'Password',btnLogin:'Accedi',btnSignup:'Crea il mio account',forgot:'Password dimenticata?',
+  consent:'Creando un account, accetti che email e date siano conservate per fornirti il servizio (vedi {link}).',consentLink:'privacy',
+  connected:'Connesso:',logout:'Esci',addDate:'Aggiungi una data',dLabel:'Etichetta',dLabelPh:'Matrimonio, Nascita di Tristan…',dType:'Tipo',
+  tNaissance:'🎂 Nascita',tMariage:'💍 Matrimonio',tRencontre:'❤️ Incontro',tAutre:'✦ Altro',save:'＋ Salva',myDates:'Le mie date',noDates:'Nessuna data salvata.',
+  myData:'I miei dati',rgpdDesc:'Puoi esportare i tuoi dati o eliminare definitivamente account e date in qualsiasi momento.',exportData:'⬆ Esporta i miei dati',deleteAcc:'Elimina account',
+  back:'‹ Indietro',footTag:'Jouriversaire — festeggia le tue migliaia di giorni.',footLegal:'Note legali e privacy',
+  mPreview:'Gli account funzioneranno una volta pubblicato il sito con il tuo progetto Supabase. Il calcolatore funziona già.',mFields:'Email e password obbligatorie.',mInvalid:'Credenziali errate.',
+  mCreated:'Account creato! Controlla la posta e clicca il link di conferma.',mReset:'Email di reimpostazione inviata.',mFieldsReq:'Etichetta e data obbligatorie.',mEmailFirst:'Inserisci prima la tua email.',
+  cDelDate:'Eliminare «{l}»?',cDelAcc:'Eliminare DEFINITIVAMENTE account e date? Azione irreversibile.',accDeleted:'Account e dati eliminati.',newPass:'Scegli una nuova password:',passUpd:'Password aggiornata.',
+  legal:'<h4>Note legali e privacy</h4><p><b>Editore:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Hosting:</b> GitHub Pages; account e database su Supabase (regione UE).</p><h4>Dati</h4><p>Senza account: nulla è memorizzato. Con account: email e date, solo per il servizio di salvataggio.</p><h4>I tuoi diritti</h4><p>Accesso, rettifica, portabilità (esportazione) e cancellazione da «I miei dati». Base giuridica: consenso ed esecuzione del servizio.</p><p>«Jouriversaire» — concetto e termine creati da Georges Viana. © 2026.</p>'},
+ zh:{lang:'中文',navAccount:'我的账户 ›',heroT:'何不数一数你的天数，|而不只是年岁？',
+  lede1:'<b>Jouriversaire</b>（千日纪念）是你的天数计数器跨越整数里程碑的那一天：10,000 天、20,000 天、25,000 天……',
+  lede2:'这些以千计的日子<b>更罕见</b>，尤其<b>难以预测</b>：与总在同一季节的生日不同，一个 jouriversaire 可能落在盛夏，下一个却在隆冬。每一个都是真正的惊喜——在意想不到之处庆祝。',
+  copy:'"Jouriversaire" —— 概念与名称由 Georges Viana 创立。© 2026 Georges Viana。保留所有权利。',
+  calc:'计算你的千日纪念',fDate:'日期',fTime:'时间（可选）',
+  lifeTpl:'<b>{y}</b> 岁 · <b>{m}</b> 个月 · <b>{d}</b> 天',nextLabel:'下一个千日纪念',daysWord:'天',
+  nextSub:'{date} · {n} 天后',uJours:'天',uSemaines:'周',uMois:'月',uAnnees:'年',uHeures:'小时',uMinutes:'分钟',uSecondes:'秒',
+  anecLabel:'历史上的今天',anecTpl:'{year} 年：{text}',anecLoad:'正在查找趣闻…',anecNone:'此日期暂无趣闻。',anecErr:'趣闻暂时无法获取。',
+  keep:'保存你的日期',keepDesc:'创建免费账户即可<b>保存你和家人的日期</b>，每次登录都能在所有设备上找回。',createAcc:'创建免费账户',
+  backCalc:'‹ 返回计算器',tabLogin:'登录',tabSignup:'注册',fEmail:'电子邮箱',fPass:'密码',btnLogin:'登录',btnSignup:'创建账户',forgot:'忘记密码？',
+  consent:'创建账户即表示你同意为提供服务而保存你的邮箱和日期（见{link}）。',consentLink:'隐私',
+  connected:'已登录：',logout:'退出',addDate:'添加日期',dLabel:'名称',dLabelPh:'婚礼、Tristan 出生…',dType:'类型',
+  tNaissance:'🎂 出生',tMariage:'💍 婚礼',tRencontre:'❤️ 相遇',tAutre:'✦ 其他',save:'＋ 保存',myDates:'我的日期',noDates:'还没有保存的日期。',
+  myData:'我的数据',rgpdDesc:'你可以随时导出数据，或永久删除账户及全部日期。',exportData:'⬆ 导出我的数据',deleteAcc:'删除账户',
+  back:'‹ 返回',footTag:'Jouriversaire —— 庆祝你的千日时光。',footLegal:'法律声明与隐私',
+  mPreview:'网站部署并配置好 Supabase 后，账户功能即可使用。计算器现在已可用。',mFields:'需填写邮箱和密码。',mInvalid:'凭据无效。',
+  mCreated:'账户已创建！请查收邮件并点击确认链接。',mReset:'重置邮件已发送。',mFieldsReq:'需填写名称和日期。',mEmailFirst:'请先输入邮箱。',
+  cDelDate:'删除"{l}"？',cDelAcc:'永久删除账户及全部日期？此操作不可撤销。',accDeleted:'账户和数据已删除。',newPass:'请输入新密码：',passUpd:'密码已更新。',
+  legal:'<h4>法律声明与隐私</h4><p><b>发布者：</b>SAS NEW-D — Georges Viana，圣马洛。contact@jouriversaire.com。</p><p><b>托管：</b>GitHub Pages；账户与数据库在 Supabase（欧盟区域）。</p><h4>数据</h4><p>无账户：不保存任何数据。有账户：仅为保存服务而保留你的邮箱和日期。</p><h4>你的权利</h4><p>可在"我的数据"中访问、更正、导出和删除。法律依据：同意及服务履行。</p><p>"Jouriversaire" 概念与名称由 Georges Viana 创立。© 2026。</p>'},
+ ja:{lang:'日本語',navAccount:'マイアカウント ›',heroT:'年ではなく、|日を数えてみませんか？',
+  lede1:'<b>Jouriversaire</b>（ジュリヴェルセール）とは、あなたの「生きた日数」がキリのよい節目を超える日です：10,000日、20,000日、25,000日…',
+  lede2:'これら数千日の節目は<b>より稀</b>で、何より<b>予測できません</b>。いつも同じ季節に来る誕生日と違い、ある節目は真夏に、次は真冬に訪れることも。どれも本当の驚き——思いがけない時に祝う機会です。',
+  copy:'「Jouriversaire」—— 概念と名称は Georges Viana による創作。© 2026 Georges Viana. 無断転載を禁じます。',
+  calc:'あなたの節目を計算',fDate:'日付',fTime:'時刻（任意）',
+  lifeTpl:'<b>{y}</b> 歳 · <b>{m}</b> ヶ月 · <b>{d}</b> 日',nextLabel:'次の節目',daysWord:'日',
+  nextSub:'{date} · あと {n} 日',uJours:'日',uSemaines:'週',uMois:'ヶ月',uAnnees:'年',uHeures:'時間',uMinutes:'分',uSecondes:'秒',
+  anecLabel:'今日は何の日',anecTpl:'{year}年：{text}',anecLoad:'豆知識を検索中…',anecNone:'この日付の豆知識はありません。',anecErr:'豆知識は現在利用できません。',
+  keep:'日付を保存',keepDesc:'無料アカウントを作成すると、<b>あなたや家族の日付を保存</b>し、ログインのたびにすべての端末で呼び出せます。',createAcc:'無料アカウントを作成',
+  backCalc:'‹ 計算機に戻る',tabLogin:'ログイン',tabSignup:'登録',fEmail:'メール',fPass:'パスワード',btnLogin:'ログイン',btnSignup:'アカウント作成',forgot:'パスワードをお忘れですか？',
+  consent:'アカウント作成により、サービス提供のためメールと日付を保存することに同意します（{link}参照）。',consentLink:'プライバシー',
+  connected:'ログイン中：',logout:'ログアウト',addDate:'日付を追加',dLabel:'ラベル',dLabelPh:'結婚、Tristan の誕生…',dType:'種類',
+  tNaissance:'🎂 誕生',tMariage:'💍 結婚',tRencontre:'❤️ 出会い',tAutre:'✦ その他',save:'＋ 保存',myDates:'マイ日付',noDates:'保存された日付はまだありません。',
+  myData:'マイデータ',rgpdDesc:'いつでもデータをエクスポートしたり、アカウントとすべての日付を完全に削除できます。',exportData:'⬆ データをエクスポート',deleteAcc:'アカウント削除',
+  back:'‹ 戻る',footTag:'Jouriversaire —— あなたの数千日を祝おう。',footLegal:'法的事項とプライバシー',
+  mPreview:'サイトを Supabase 設定込みで公開すると、アカウント機能が有効になります。計算機は今すぐ使えます。',mFields:'メールとパスワードが必要です。',mInvalid:'認証情報が正しくありません。',
+  mCreated:'アカウント作成完了！メールを確認し、確認リンクをクリックしてください。',mReset:'リセットメールを送信しました。',mFieldsReq:'ラベルと日付が必要です。',mEmailFirst:'先にメールを入力してください。',
+  cDelDate:'「{l}」を削除しますか？',cDelAcc:'アカウントとすべての日付を完全に削除しますか？取り消せません。',accDeleted:'アカウントとデータを削除しました。',newPass:'新しいパスワードを入力：',passUpd:'パスワードを更新しました。',
+  legal:'<h4>法的事項とプライバシー</h4><p><b>発行者：</b>SAS NEW-D — Georges Viana、サンマロ。contact@jouriversaire.com。</p><p><b>ホスティング：</b>GitHub Pages；アカウントとデータベースは Supabase（EU リージョン）。</p><h4>データ</h4><p>アカウントなし：何も保存しません。アカウントあり：保存サービスのためにのみメールと日付を保持します。</p><h4>あなたの権利</h4><p>「マイデータ」からアクセス・訂正・エクスポート・削除が可能。法的根拠：同意およびサービスの履行。</p><p>「Jouriversaire」概念と名称は Georges Viana による。© 2026。</p>'},
+ ko:{lang:'한국어',navAccount:'내 계정 ›',heroT:'해가 아니라,|날을 세어보면 어떨까요?',
+  lede1:'<b>Jouriversaire</b>(주리베르세르)는 당신이 살아온 날수가 딱 떨어지는 이정표를 넘는 날입니다: 10,000일, 20,000일, 25,000일…',
+  lede2:'이 수천 일의 이정표는 <b>더 드물고</b> 무엇보다 <b>예측하기 어렵습니다</b>: 늘 같은 계절에 오는 생일과 달리, 어떤 주리베르세르는 한여름에, 다음은 한겨울에 올 수 있습니다. 모두가 진짜 놀라움 — 예상치 못한 곳에서 축하할 기회입니다.',
+  copy:'"Jouriversaire" — 개념과 명칭은 Georges Viana가 창안. © 2026 Georges Viana. 모든 권리 보유.',
+  calc:'당신의 이정표 계산',fDate:'날짜',fTime:'시간 (선택)',
+  lifeTpl:'<b>{y}</b>년 · <b>{m}</b>개월 · <b>{d}</b>일',nextLabel:'다음 이정표',daysWord:'일',
+  nextSub:'{date} · {n}일 후',uJours:'일',uSemaines:'주',uMois:'개월',uAnnees:'년',uHeures:'시간',uMinutes:'분',uSecondes:'초',
+  anecLabel:'역사 속 오늘',anecTpl:'{year}년: {text}',anecLoad:'이야깃거리 검색 중…',anecNone:'이 날짜의 이야깃거리가 없습니다.',anecErr:'지금은 이용할 수 없습니다.',
+  keep:'날짜 저장하기',keepDesc:'무료 계정을 만들면 <b>당신과 가족의 날짜를 저장</b>하고 로그인할 때마다 모든 기기에서 다시 찾을 수 있습니다.',createAcc:'무료 계정 만들기',
+  backCalc:'‹ 계산기로 돌아가기',tabLogin:'로그인',tabSignup:'가입',fEmail:'이메일',fPass:'비밀번호',btnLogin:'로그인',btnSignup:'계정 만들기',forgot:'비밀번호를 잊으셨나요?',
+  consent:'계정을 만들면 서비스 제공을 위해 이메일과 날짜가 저장되는 데 동의합니다({link} 참조).',consentLink:'개인정보',
+  connected:'로그인됨:',logout:'로그아웃',addDate:'날짜 추가',dLabel:'이름',dLabelPh:'결혼, Tristan 출생…',dType:'유형',
+  tNaissance:'🎂 출생',tMariage:'💍 결혼',tRencontre:'❤️ 만남',tAutre:'✦ 기타',save:'＋ 저장',myDates:'내 날짜',noDates:'아직 저장된 날짜가 없습니다.',
+  myData:'내 데이터',rgpdDesc:'언제든지 데이터를 내보내거나 계정과 모든 날짜를 영구 삭제할 수 있습니다.',exportData:'⬆ 내 데이터 내보내기',deleteAcc:'계정 삭제',
+  back:'‹ 뒤로',footTag:'Jouriversaire — 당신의 수천 일을 축하하세요.',footLegal:'법적 고지 및 개인정보',
+  mPreview:'Supabase 설정과 함께 사이트를 배포하면 계정 기능이 작동합니다. 계산기는 지금도 사용할 수 있습니다.',mFields:'이메일과 비밀번호가 필요합니다.',mInvalid:'잘못된 인증 정보입니다.',
+  mCreated:'계정이 생성되었습니다! 메일함을 확인하고 확인 링크를 클릭하세요.',mReset:'재설정 메일을 보냈습니다.',mFieldsReq:'이름과 날짜가 필요합니다.',mEmailFirst:'먼저 이메일을 입력하세요.',
+  cDelDate:'"{l}"을(를) 삭제할까요?',cDelAcc:'계정과 모든 날짜를 영구 삭제할까요? 되돌릴 수 없습니다.',accDeleted:'계정과 데이터가 삭제되었습니다.',newPass:'새 비밀번호를 입력하세요:',passUpd:'비밀번호가 변경되었습니다.',
+  legal:'<h4>법적 고지 및 개인정보</h4><p><b>발행자:</b> SAS NEW-D — Georges Viana, 생말로. contact@jouriversaire.com.</p><p><b>호스팅:</b> GitHub Pages; 계정과 데이터베이스는 Supabase(EU 지역).</p><h4>데이터</h4><p>계정 없음: 아무것도 저장하지 않습니다. 계정 있음: 저장 서비스를 위해서만 이메일과 날짜를 보관합니다.</p><h4>당신의 권리</h4><p>"내 데이터"에서 열람·정정·내보내기·삭제 가능. 법적 근거: 동의 및 서비스 이행.</p><p>"Jouriversaire" 개념과 명칭은 Georges Viana. © 2026.</p>'},
+ ar:{lang:'العربية',navAccount:'‹ حسابي',heroT:'ماذا لو عددت أيامك،|لا سنواتك فقط؟',
+  lede1:'<b>Jouriversaire</b> هو اليوم الذي يتجاوز فيه عدّاد أيامك رقماً دائرياً: 10٬000 يوم، 20٬000 يوم، 25٬000 يوم…',
+  lede2:'هذه الآلاف من الأيام <b>أندر</b> وقبل كل شيء <b>غير متوقعة</b>: على عكس عيد ميلادك الذي يأتي دائماً في الموسم نفسه، قد يقع أحدها في عزّ الصيف والتالي في عزّ الشتاء. كلٌّ منها مفاجأة حقيقية — مناسبة للاحتفال حيث لا تتوقع.',
+  copy:'«Jouriversaire» — مفهوم ومصطلح من ابتكار Georges Viana. © 2026 Georges Viana. جميع الحقوق محفوظة.',
+  calc:'احسب مناسباتك الألفية',fDate:'التاريخ',fTime:'الوقت (اختياري)',
+  lifeTpl:'<b>{y}</b> سنة · <b>{m}</b> شهر · <b>{d}</b> يوم',nextLabel:'المناسبة القادمة',daysWord:'يوم',
+  nextSub:'{date} · خلال {n} يوم',uJours:'أيام',uSemaines:'أسابيع',uMois:'أشهر',uAnnees:'سنوات',uHeures:'ساعات',uMinutes:'دقائق',uSecondes:'ثوانٍ',
+  anecLabel:'في مثل هذا اليوم',anecTpl:'في {year}: {text}',anecLoad:'جارٍ البحث عن معلومة…',anecNone:'لا توجد معلومة لهذا التاريخ.',anecErr:'المعلومة غير متاحة حالياً.',
+  keep:'احفظ تواريخك',keepDesc:'أنشئ حساباً مجانياً <b>لحفظ تواريخك وتواريخ عائلتك</b> واستعادتها عند كل تسجيل دخول، على جميع أجهزتك.',createAcc:'إنشاء حساب مجاني',
+  backCalc:'الحاسبة ›',tabLogin:'تسجيل الدخول',tabSignup:'إنشاء حساب',fEmail:'البريد الإلكتروني',fPass:'كلمة المرور',btnLogin:'تسجيل الدخول',btnSignup:'إنشاء حسابي',forgot:'هل نسيت كلمة المرور؟',
+  consent:'بإنشاء حساب، فإنك توافق على حفظ بريدك وتواريخك لتقديم الخدمة (انظر {link}).',consentLink:'الخصوصية',
+  connected:'متصل:',logout:'تسجيل الخروج',addDate:'إضافة تاريخ',dLabel:'التسمية',dLabelPh:'زواج، ميلاد Tristan…',dType:'النوع',
+  tNaissance:'🎂 ميلاد',tMariage:'💍 زواج',tRencontre:'❤️ لقاء',tAutre:'✦ أخرى',save:'＋ حفظ',myDates:'تواريخي',noDates:'لا توجد تواريخ محفوظة بعد.',
+  myData:'بياناتي',rgpdDesc:'يمكنك تصدير بياناتك أو حذف حسابك وكل تواريخك نهائياً في أي وقت.',exportData:'⬆ تصدير بياناتي',deleteAcc:'حذف حسابي',
+  back:'رجوع ›',footTag:'Jouriversaire — احتفل بآلاف أيامك.',footLegal:'إشعار قانوني وخصوصية',
+  mPreview:'ستعمل الحسابات بمجرد نشر الموقع مع مشروع Supabase. الحاسبة تعمل الآن.',mFields:'البريد وكلمة المرور مطلوبان.',mInvalid:'بيانات اعتماد غير صحيحة.',
+  mCreated:'تم إنشاء الحساب! تحقق من بريدك وانقر رابط التأكيد.',mReset:'تم إرسال بريد إعادة التعيين.',mFieldsReq:'التسمية والتاريخ مطلوبان.',mEmailFirst:'أدخل بريدك أولاً.',
+  cDelDate:'حذف «{l}»؟',cDelAcc:'حذف حسابك وكل تواريخك نهائياً؟ لا يمكن التراجع.',accDeleted:'تم حذف حسابك وبياناتك.',newPass:'اختر كلمة مرور جديدة:',passUpd:'تم تحديث كلمة المرور.',
+  legal:'<h4>إشعار قانوني وخصوصية</h4><p><b>الناشر:</b> SAS NEW-D — Georges Viana، سان مالو. contact@jouriversaire.com.</p><p><b>الاستضافة:</b> GitHub Pages؛ الحسابات وقاعدة البيانات على Supabase (منطقة الاتحاد الأوروبي).</p><h4>البيانات</h4><p>بدون حساب: لا يُحفظ شيء. مع حساب: بريدك وتواريخك فقط لتقديم خدمة الحفظ.</p><h4>حقوقك</h4><p>الوصول والتصحيح والنقل (تصدير) والمحو من «بياناتي». الأساس القانوني: الموافقة وتنفيذ الخدمة.</p><p>«Jouriversaire» مفهوم ومصطلح من ابتكار Georges Viana. © 2026.</p>'}
+};
+const LOCALES={fr:'fr-FR',en:'en-GB',es:'es-ES',pt:'pt-PT',pl:'pl-PL',de:'de-DE',it:'it-IT',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',ar:'ar'};
+const RTL={ar:1};
+
+const LOGO='<svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
++'<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBB040"/><stop offset="0.55" stop-color="#F2674A"/><stop offset="1" stop-color="#F0506E"/></linearGradient></defs>'
++'<rect x="3" y="3" width="94" height="94" rx="22" fill="url(#lg)"/>'
++'<circle cx="50" cy="51" r="35" fill="none" stroke="#fff6e0" stroke-width="1.4" opacity="0.75"/>'
++'<circle cx="24" cy="34" r="2" fill="#ffe9b0"/><circle cx="74" cy="30" r="2" fill="#bdf3c6"/><circle cx="80" cy="56" r="1.8" fill="#9bd4ff"/><circle cx="20" cy="60" r="1.8" fill="#ffd0e0"/>'
++'<g transform="translate(50,46)"><rect x="-15" y="2" width="30" height="15" rx="3.5" fill="#fdeccb"/><rect x="-15" y="2" width="30" height="6" rx="3" fill="#f4d49a"/><rect x="-1.4" y="-9" width="2.8" height="11" rx="1.2" fill="#8fd0ff"/><path d="M0 -16 q3.4 3.5 0 6 q-3.4 -2.5 0 -6 z" fill="#ffb703"/></g></svg>';
+const TYPE_ICON={naissance:'🎂',mariage:'💍',rencontre:'❤️',autre:'✦'};
+const MS_DAY=86400000;
+const $=id=>document.getElementById(id);
+
+let L='fr';
+const t=k=>(I18N[L]&&I18N[L][k]!=null)?I18N[L][k]:I18N.fr[k];
+const loc=()=>LOCALES[L]||'fr-FR';
+const fmt=n=>Math.round(n).toLocaleString(loc());
+const esc=s=>(''+s).replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+function lget(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lset(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+
+/* Supabase */
+let sb=null;
+const configured=()=>SUPABASE_URL.indexOf('VOTRE')<0&&SUPABASE_ANON.indexOf('VOTRE')<0;
+if(window.supabase&&configured()){try{sb=window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON);}catch(e){}}
+
+/* date math */
+function addMonths(d,n){const x=new Date(d.getTime());const day=x.getDate();x.setMonth(x.getMonth()+n);if(x.getDate()<day)x.setDate(0);return x;}
+function exactAge(b,now){let y=now.getFullYear()-b.getFullYear(),m=now.getMonth()-b.getMonth(),d=now.getDate()-b.getDate();if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate();}if(m<0){y--;m+=12;}return {y:y,m:m,d:d};}
+function counts(b,now){const diff=now-b,a=exactAge(b,now);return {jours:Math.floor(diff/MS_DAY),semaines:Math.floor(diff/MS_DAY/7),mois:a.y*12+a.m,annees:a.y,heures:Math.floor(diff/3600000),minutes:Math.floor(diff/60000),secondes:Math.floor(diff/1000),age:a};}
+function nextMult(c,s){return (Math.floor(c/s)+1)*s;}
+const fmtDate=(d,opt)=>d.toLocaleDateString(loc(),opt);
+
+/* ===== translation apply ===== */
+function applyLang(){
+  document.documentElement.lang=L;
+  document.documentElement.dir=RTL[L]?'rtl':'ltr';
+  const ht=t('heroT').split('|');
+  $('hero-title').innerHTML=esc?ht.map(s=>s).join('<br>'):ht.join('<br>');
+  $('hero-title').innerHTML='<span>'+ht[0]+'</span><br><em>'+(ht[1]||'')+'</em>';
+  $('lede1').innerHTML=t('lede1');$('lede2').innerHTML=t('lede2');$('copyline').textContent=t('copy');
+  $('lbl-calc').textContent=t('calc');$('lbl-date').textContent=t('fDate');$('lbl-time').textContent=t('fTime');
+  $('lbl-anec').textContent=t('anecLabel');
+  $('lbl-keep').textContent=t('keep');$('txt-keep').innerHTML=t('keepDesc');$('cta-account').textContent=t('createAcc');
+  $('nav-account').textContent=t('navAccount');
+  $('back-home').textContent=t('backCalc');$('back-home2').textContent=t('back');
+  $('tab-login').textContent=t('tabLogin');$('tab-signup').textContent=t('tabSignup');
+  $('lbl-email').textContent=t('fEmail');$('lbl-pass').textContent=t('fPass');
+  $('a-forgot').innerHTML=t('forgot');
+  $('who-label').textContent=t('connected');$('a-logout').textContent=t('logout');
+  $('lbl-add').textContent=t('addDate');$('lbl-dlabel').textContent=t('dLabel');$('d-name').placeholder=t('dLabelPh');
+  $('lbl-dtype').textContent=t('dType');$('lbl-ddate').textContent=t('fDate');$('lbl-dtime').textContent=t('fTime');
+  $('opt-naissance').textContent=t('tNaissance');$('opt-mariage').textContent=t('tMariage');$('opt-rencontre').textContent=t('tRencontre');$('opt-autre').textContent=t('tAutre');
+  $('d-add').textContent=t('save');$('lbl-mydates').textContent=t('myDates');$('d-empty').textContent=t('noDates');
+  $('lbl-mydata').textContent=t('myData');$('rgpd-desc').textContent=t('rgpdDesc');$('rgpd-export').textContent=t('exportData');$('rgpd-delete').textContent=t('deleteAcc');
+  $('legal-body').innerHTML=t('legal');$('foot-tag').textContent=t('footTag');$('foot-legal').textContent=t('footLegal');
+  setMode(mode);
+  bindConsent();
+  if(calcDate)renderCalc();
+  renderMyDates();
+}
+function bindConsent(){
+  $('consent').innerHTML=t('consent').replace('{link}','<a href="#" id="open-legal">'+t('consentLink')+'</a>');
+  const ol=$('open-legal');if(ol)ol.addEventListener('click',e=>{e.preventDefault();show('legal');});
+}
+
+/* ===== calculator ===== */
+let calcDate=null,calcTick=null;
+function readCalc(){const dv=$('c-date').value;if(!dv)return null;const tv=$('c-time').value||'00:00';const dt=new Date(dv+'T'+tv);if(isNaN(dt.getTime())||dt>new Date())return null;return dt;}
+function renderCalc(){
+  const dt=readCalc();const res=$('results');if(!dt){res.style.display='none';calcDate=null;return;}
+  calcDate=dt;res.style.display='block';const now=new Date(),c=counts(dt,now);
+  $('r-age').innerHTML=t('lifeTpl').replace('{y}',c.age.y).replace('{m}',c.age.m).replace('{d}',c.age.d);
+  const n1=nextMult(c.jours,1000),d1=new Date(dt.getTime()+n1*MS_DAY),r1=Math.ceil((d1-now)/MS_DAY);
+  $('r-next').innerHTML='<div><div class="lbl">'+t('nextLabel')+'</div><div class="big">'+fmt(n1)+' '+t('daysWord')+'</div>'
+    +'<div class="sub">'+t('nextSub').replace('{date}',fmtDate(d1,{weekday:'long',day:'numeric',month:'long',year:'numeric'})).replace('{n}',fmt(r1))+'</div></div>';
+  const n5=nextMult(c.jours,5000),d5=new Date(dt.getTime()+n5*MS_DAY),n10=nextMult(c.jours,10000),d10=new Date(dt.getTime()+n10*MS_DAY);
+  $('r-next2').innerHTML='<div class="cell"><div class="t">'+fmt(n5)+' '+t('daysWord')+'</div><div class="s">'+fmtDate(d5,{day:'numeric',month:'short',year:'numeric'})+'</div></div>'
+    +'<div class="cell"><div class="t">'+fmt(n10)+' '+t('daysWord')+'</div><div class="s">'+fmtDate(d10,{day:'numeric',month:'short',year:'numeric'})+'</div></div>';
+  const cells=[['jours','uJours',1],['semaines','uSemaines',0],['mois','uMois',0],['annees','uAnnees',0],['heures','uHeures',0],['minutes','uMinutes',0],['secondes','uSecondes',0]];
+  $('r-grid').innerHTML=cells.map(x=>'<div class="stat'+(x[2]?' lead':'')+'"><div class="stat-l">'+t(x[1])+'</div><div class="stat-v" id="cv-'+x[0]+'">'+fmt(c[x[0]])+'</div></div>').join('');
+  if(calcTick)clearInterval(calcTick);
+  calcTick=setInterval(()=>{const cc=counts(calcDate,new Date());['secondes','minutes','heures'].forEach(u=>{const e=$('cv-'+u);if(e)e.textContent=fmt(cc[u]);});},1000);
+  loadAnecdote(dt);
+}
+function loadAnecdote(dt){
+  const el=$('anec-txt');el.textContent=t('anecLoad');
+  const mm=('0'+(dt.getMonth()+1)).slice(-2),dd=('0'+dt.getDate()).slice(-2);
+  fetch('https://'+L+'.wikipedia.org/api/rest_v1/feed/onthisday/events/'+mm+'/'+dd)
+    .then(r=>r.json()).then(data=>{const ev=(data&&data.events)||[];if(!ev.length){el.textContent=t('anecNone');return;}
+      const p=ev[Math.floor(Math.random()*Math.min(ev.length,15))];el.textContent=t('anecTpl').replace('{year}',p.year).replace('{text}',p.text);})
+    .catch(()=>{el.textContent=t('anecErr');});
+}
+$('c-date').addEventListener('change',renderCalc);$('c-date').addEventListener('input',renderCalc);$('c-time').addEventListener('change',renderCalc);
+$('anec-refresh').addEventListener('click',()=>{if(calcDate)loadAnecdote(calcDate);});
+$('c-date').max=new Date().toISOString().split('T')[0];
+
+/* nav */
+function show(v){['home','account','legal'].forEach(x=>$('view-'+x).classList.add('hidden'));$('view-'+v).classList.remove('hidden');window.scrollTo(0,0);}
+$('nav-account').addEventListener('click',()=>show('account'));
+$('cta-account').addEventListener('click',()=>{show('account');setMode('signup');});
+$('back-home').addEventListener('click',()=>show('home'));
+$('back-home2').addEventListener('click',()=>show('account'));
+$('foot-legal').addEventListener('click',()=>show('legal'));
+
+/* auth UI */
+let mode='login';
+function setMode(m){mode=m;const on=m==='signup';
+  $('tab-login').classList.toggle('active',!on);$('tab-signup').classList.toggle('active',on);
+  $('a-submit').textContent=on?t('btnSignup'):t('btnLogin');
+  $('consent').style.display=on?'block':'none';$('a-forgot').style.display=on?'none':'inline';hideMsg('a-msg');}
+$('tab-login').addEventListener('click',()=>setMode('login'));
+$('tab-signup').addEventListener('click',()=>setMode('signup'));
+function msg(id,k,h){const e=$(id);e.className='msg show '+k;e.innerHTML=h;}
+function hideMsg(id){$(id).className='msg';}
+function needSb(){if(!sb){msg('a-msg','info',t('mPreview'));return false;}return true;}
+
+$('a-submit').addEventListener('click',()=>{
+  const email=($('a-email').value||'').trim(),pass=$('a-pass').value||'';
+  if(!email||!pass){msg('a-msg','err',t('mFields'));return;}
+  if(!needSb())return;$('a-submit').disabled=true;
+  if(mode==='signup'){
+    sb.auth.signUp({email:email,password:pass,options:{emailRedirectTo:location.origin+location.pathname}}).then(r=>{$('a-submit').disabled=false;if(r.error){msg('a-msg','err',r.error.message);return;}msg('a-msg','ok',t('mCreated'));});
+  }else{
+    sb.auth.signInWithPassword({email:email,password:pass}).then(r=>{$('a-submit').disabled=false;if(r.error){msg('a-msg','err',r.error.message==='Invalid login credentials'?t('mInvalid'):r.error.message);return;}});
+  }
+});
+$('a-forgot').addEventListener('click',()=>{
+  const email=($('a-email').value||'').trim();if(!email){msg('a-msg','info',t('mEmailFirst'));return;}if(!needSb())return;
+  sb.auth.resetPasswordForEmail(email,{redirectTo:location.origin+location.pathname}).then(r=>{if(r.error){msg('a-msg','err',r.error.message);return;}msg('a-msg','ok',t('mReset'));});
+});
+$('a-logout').addEventListener('click',()=>{if(sb)sb.auth.signOut();});
+
+let user=null,myDates=[];
+function setAuth(u){user=u;$('auth-block').classList.toggle('hidden',!!u);$('app-block').classList.toggle('hidden',!u);$('cta-card').style.display=u?'none':'block';if(u){$('who-email').textContent=u.email;loadMyDates();}}
+if(sb){
+  sb.auth.getSession().then(r=>setAuth(r.data.session?r.data.session.user:null));
+  sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY'){const np=prompt(t('newPass'));if(np)sb.auth.updateUser({password:np}).then(r=>alert(r.error?r.error.message:t('passUpd')));}setAuth(s?s.user:null);});
+}
+function loadMyDates(){if(!sb)return;sb.from('jv_dates').select('*').order('date_ref',{ascending:true}).then(r=>{if(r.error){msg('d-msg','err',r.error.message);return;}myDates=r.data||[];renderMyDates();});}
+function renderMyDates(){
+  const list=$('d-list');if(!list)return;list.innerHTML='';$('d-empty').style.display=myDates.length?'none':'block';const now=new Date();
+  myDates.forEach(p=>{const b=new Date(p.date_ref),c=counts(b,now);const el=document.createElement('div');el.className='item';
+    el.innerHTML='<div class="ava">'+(TYPE_ICON[p.type]||'✦')+'</div><div style="min-width:0"><div class="it-name">'+esc(p.libelle)+'</div><div class="it-sub">'+fmtDate(b,{day:'numeric',month:'short',year:'numeric'})+'</div></div>'
+      +'<div class="it-days"><b>'+fmt(c.jours)+'</b><span>'+t('daysWord')+'</span></div><div class="del-x" data-del="'+p.id+'">✕</div>';
+    el.addEventListener('click',e=>{if(e.target.getAttribute('data-del'))return;$('c-date').value=(''+p.date_ref).slice(0,10);const tm=(''+p.date_ref).slice(11,16);$('c-time').value=(tm&&tm!=='00:00')?tm:'';show('home');renderCalc();});
+    el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();delDate(p.id,p.libelle);});
+    list.appendChild(el);});
+}
+$('d-add').addEventListener('click',()=>{if(!sb)return;const libelle=($('d-name').value||'').trim(),type=$('d-type').value,dv=$('d-date').value,tv=$('d-time').value||'00:00';if(!libelle||!dv){msg('d-msg','err',t('mFieldsReq'));return;}const iso=new Date(dv+'T'+tv).toISOString();sb.from('jv_dates').insert({libelle:libelle,type:type,date_ref:iso}).select().then(r=>{if(r.error){msg('d-msg','err',r.error.message);return;}$('d-name').value='';$('d-date').value='';$('d-time').value='';hideMsg('d-msg');loadMyDates();});});
+function delDate(id,lib){if(!confirm(t('cDelDate').replace('{l}',lib)))return;sb.from('jv_dates').delete().eq('id',id).then(r=>{if(r.error){alert(r.error.message);return;}loadMyDates();});}
+$('rgpd-export').addEventListener('click',()=>{const data={compte:user?user.email:null,exporte:new Date().toISOString(),dates:myDates};const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='jouriversaire.json';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);});
+$('rgpd-delete').addEventListener('click',()=>{if(!sb)return;if(!confirm(t('cDelAcc')))return;sb.rpc('jv_delete_account').then(r=>{if(r.error){alert(r.error.message);return;}alert(t('accDeleted'));sb.auth.signOut();});});
+
+/* lang selector */
+const sel=$('lang-sel');
+Object.keys(I18N).forEach(code=>{const o=document.createElement('option');o.value=code;o.textContent=I18N[code].lang;sel.appendChild(o);});
+sel.addEventListener('change',()=>{L=sel.value;lset('jv_lang',L);applyLang();});
+
+/* init */
+$('logo-slot').innerHTML=LOGO;
+const saved=lget('jv_lang'),nav=(navigator.language||'fr').slice(0,2).toLowerCase();
+L=(saved&&I18N[saved])?saved:(I18N[nav]?nav:'fr');
+sel.value=L;
+applyLang();
+
+}catch(err){
+  document.body.innerHTML='<div style="color:#2d2820;font-family:monospace;padding:30px;max-width:700px;margin:auto"><h2 style="color:#d4582f">Erreur</h2><p style="margin-top:12px;line-height:1.6">'+(err&&err.message?err.message:err)+'</p></div>';
+}
+})();
+</script>
+</body>
+</html>
