@@ -458,8 +458,9 @@ if(window.supabase&&configured()){try{sb=window.supabase.createClient(SUPABASE_U
 /* date math */
 function addMonths(d,n){const x=new Date(d.getTime());const day=x.getDate();x.setMonth(x.getMonth()+n);if(x.getDate()<day)x.setDate(0);return x;}
 function exactAge(b,now){let y=now.getFullYear()-b.getFullYear(),m=now.getMonth()-b.getMonth(),d=now.getDate()-b.getDate();if(d<0){m--;d+=new Date(now.getFullYear(),now.getMonth(),0).getDate();}if(m<0){y--;m+=12;}return {y:y,m:m,d:d};}
-function counts(b,now){const diff=now-b,a=exactAge(b,now);return {jours:Math.floor(diff/MS_DAY),semaines:Math.floor(diff/MS_DAY/7),mois:a.y*12+a.m,annees:a.y,heures:Math.floor(diff/3600000),minutes:Math.floor(diff/60000),secondes:Math.floor(diff/1000),age:a};}
-function nextMult(c,s){return (Math.floor(c/s)+1)*s;}
+function trunc0(x){return x>=0?Math.floor(x):Math.ceil(x);}
+function counts(b,now){var diff=now-b,fut=diff<0,a=fut?exactAge(now,b):exactAge(b,now),sgn=fut?-1:1;return {jours:trunc0(diff/MS_DAY),semaines:trunc0(diff/MS_DAY/7),mois:sgn*(a.y*12+a.m),annees:sgn*a.y,heures:trunc0(diff/3600000),minutes:trunc0(diff/60000),secondes:trunc0(diff/1000),age:{y:sgn*a.y,m:sgn*a.m,d:sgn*a.d}};}
+function nextMult(c,s){var r=(Math.floor(c/s)+1)*s;return r>0?r:s;}
 const fmtDate=(d,opt)=>d.toLocaleDateString(loc(),opt);
 
 /* ===== translation apply ===== */
@@ -497,7 +498,7 @@ function bindConsent(){
 
 /* ===== calculator ===== */
 let calcDate=null,calcTick=null;
-function readCalc(){const dv=$('c-date').value;if(!dv)return null;const tv=$('c-time').value||'00:00';const dt=new Date(dv+'T'+tv);if(isNaN(dt.getTime())||dt>new Date())return null;return dt;}
+function readCalc(){const dv=$('c-date').value;if(!dv)return null;const tv=$('c-time').value||'00:00';const dt=new Date(dv+'T'+tv);if(isNaN(dt.getTime()))return null;return dt;}
 function renderCalc(){
   const dt=readCalc();const res=$('results');if(!dt){res.style.display='none';calcDate=null;return;}
   calcDate=dt;res.style.display='block';const now=new Date(),c=counts(dt,now);
@@ -524,10 +525,13 @@ function loadAnecdote(dt){
 }
 $('c-date').addEventListener('change',renderCalc);$('c-date').addEventListener('input',renderCalc);$('c-time').addEventListener('change',renderCalc);
 $('anec-refresh').addEventListener('click',()=>{if(calcDate)loadAnecdote(calcDate);});
-$('c-date').max=new Date().toISOString().split('T')[0];
+/* dates futures autorisées : pas de max sur le champ */
 
 /* nav */
-function show(v){['home','account','legal'].forEach(x=>$('view-'+x).classList.add('hidden'));$('view-'+v).classList.remove('hidden');window.scrollTo(0,0);}
+function showView(v){['home','account','legal'].forEach(x=>$('view-'+x).classList.add('hidden'));$('view-'+v).classList.remove('hidden');window.scrollTo(0,0);}
+function show(v){showView(v);try{history.pushState({v:v},'');}catch(e){}}
+window.addEventListener('popstate',function(e){showView((e.state&&e.state.v)||'home');});
+try{history.replaceState({v:'home'},'');}catch(e){}
 $('nav-account').addEventListener('click',()=>show('account'));
 $('cta-account').addEventListener('click',()=>{show('account');setMode('signup');});
 $('back-home').addEventListener('click',()=>show('home'));
