@@ -113,6 +113,7 @@
   </header>
 
   <section id="view-home">
+    <div style="margin:2px 0 0"><span class="nav" id="list-back" style="display:none"></span></div>
     <div class="hero">
       <h2 id="hero-title"></h2>
       <p class="lede" id="lede1"></p>
@@ -230,7 +231,7 @@ const I18N={
   keep:'Gardez vos dates',keepDesc:'Créez un compte gratuit pour <b>sauvegarder vos dates et celles de votre famille</b> et les retrouver à chaque connexion, sur tous vos appareils.',createAcc:'Créer un compte gratuit',
   backCalc:'‹ Retour au calculateur',tabLogin:'Connexion',tabSignup:'Inscription',fEmail:'Email',fPass:'Mot de passe',btnLogin:'Se connecter',btnSignup:'Créer mon compte',forgot:'Mot de passe oublié&nbsp;?',
   consent:'En créant un compte, vous acceptez que votre email et vos dates soient conservés pour vous fournir le service (voir {link}).',consentLink:'confidentialité',
-  connected:'Connecté&nbsp;:',logout:'Déconnexion',addDate:'Ajouter une date',dLabel:'Libellé',dLabelPh:'Mariage, Naissance de Tristan…',dType:'Type',
+  connected:'Connecté\u00a0:',logout:'Déconnexion',addDate:'Ajouter une date',dLabel:'Libellé',dLabelPh:'Mariage, Naissance de Tristan…',dType:'Type',
   tNaissance:'🎂 Naissance',tMariage:'💍 Mariage',tRencontre:'❤️ Rencontre',tAutre:'✦ Autre',save:'＋ Enregistrer',myDates:'Mes dates',noDates:'Aucune date enregistrée pour l\u2019instant.',
   myData:'Mes données',rgpdDesc:'Vous pouvez à tout moment exporter vos données ou supprimer définitivement votre compte et toutes vos dates.',exportData:'⬆ Exporter mes données',deleteAcc:'Supprimer mon compte',
   back:'‹ Retour',footTag:'Jouriversaire — célébrez vos milliers de jours.',footLegal:'Mentions légales & confidentialité',
@@ -537,6 +538,7 @@ $('cta-account').addEventListener('click',()=>{show('account');setMode('signup')
 $('back-home').addEventListener('click',()=>show('home'));
 $('back-home2').addEventListener('click',()=>show('account'));
 $('foot-legal').addEventListener('click',()=>show('legal'));
+$('list-back').addEventListener('click',()=>show('account'));
 
 /* auth UI */
 let mode='login';
@@ -567,7 +569,7 @@ $('a-forgot').addEventListener('click',()=>{
 $('a-logout').addEventListener('click',()=>{if(sb)sb.auth.signOut();});
 
 let user=null,myDates=[];
-function setAuth(u){user=u;$('auth-block').classList.toggle('hidden',!!u);$('app-block').classList.toggle('hidden',!u);$('cta-card').style.display=u?'none':'block';if(u){$('who-email').textContent=u.email;loadMyDates();}}
+function setAuth(u){user=u;$('auth-block').classList.toggle('hidden',!!u);$('app-block').classList.toggle('hidden',!u);$('cta-card').style.display=u?'none':'block';var lb=$('list-back');if(lb){lb.textContent='‹ '+t('myDates');lb.style.display=u?'inline':'none';}if(u){$('who-email').textContent=u.email;loadMyDates();}}
 if(sb){
   sb.auth.getSession().then(r=>setAuth(r.data.session?r.data.session.user:null));
   sb.auth.onAuthStateChange((ev,s)=>{if(ev==='PASSWORD_RECOVERY'){const np=prompt(t('newPass'));if(np)sb.auth.updateUser({password:np}).then(r=>alert(r.error?r.error.message:t('passUpd')));}setAuth(s?s.user:null);});
