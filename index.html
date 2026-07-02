@@ -1016,7 +1016,7 @@ function renderMyDates(){
   arr.forEach(p=>{const b=new Date(p.date_ref),c=counts(b,now);const el=document.createElement('div');el.className='item';
     el.innerHTML='<div class="ava">'+(TYPE_ICON[p.type]||'✦')+'</div><div style="min-width:0"><div class="it-name">'+esc(p.libelle)+'</div><div class="it-sub">'+fmtDate(b,{day:'numeric',month:'short',year:'numeric'})+'</div></div>'
       +'<div class="it-days"><b>'+fmt(c.jours)+'</b><span>'+t('daysWord')+'</span></div><div class="del-x" data-del="'+p.id+'">✕</div>';
-    el.addEventListener('click',e=>{if(e.target.getAttribute('data-del'))return;$('c-date').value=(''+p.date_ref).slice(0,10);const tm=(''+p.date_ref).slice(11,16);$('c-time').value=(tm&&tm!=='00:00')?tm:'';show('home');renderCalc();});
+    el.addEventListener('click',e=>{if(e.target.getAttribute('data-del'))return;const bd=new Date(p.date_ref),pd=n=>('0'+n).slice(-2);$('c-date').value=bd.getFullYear()+'-'+pd(bd.getMonth()+1)+'-'+pd(bd.getDate());const hh=pd(bd.getHours())+':'+pd(bd.getMinutes());$('c-time').value=(hh!=='00:00')?hh:'';show('home');renderCalc();});
     el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();delDate(p.id,p.libelle);});
     list.appendChild(el);});
 }
@@ -1027,7 +1027,7 @@ function delDate(id,lib){if(!confirm(t('cDelDate').replace('{l}',lib)))return;sb
 /* ===== Export / Import CSV ===== */
 function exportCSV(){
   const rows=['libelle;type;date'];
-  myDates.forEach(p=>{rows.push('"'+((p.libelle||'').replace(/"/g,'""'))+'";'+(p.type||'autre')+';'+(''+p.date_ref).slice(0,16).replace('T',' '));});
+  myDates.forEach(p=>{const bd=new Date(p.date_ref),pd=n=>('0'+n).slice(-2);const local=bd.getFullYear()+'-'+pd(bd.getMonth()+1)+'-'+pd(bd.getDate())+' '+pd(bd.getHours())+':'+pd(bd.getMinutes());rows.push('"'+((p.libelle||'').replace(/"/g,'""'))+'";'+(p.type||'autre')+';'+local);});
   const blob=new Blob(['\uFEFF'+rows.join('\r\n')],{type:'text/csv;charset=utf-8'});
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.href=url;a.download='jouriversaire.csv';document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),500);
 }
