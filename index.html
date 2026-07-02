@@ -5,11 +5,15 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 <meta name="description" content="Jouriversaire — célébrez vos milliers de jours." />
 <title>Jouriversaire</title>
+<link rel="apple-touch-icon" sizes="180x180" href="apple-touch-icon.png" />
+<link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png" />
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png" />
 <link rel="preconnect" href="https://fonts.googleapis.com" />
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,600;0,700;1,400;1,600&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet" />
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
-  :root{--serif:'Playfair Display',Georgia,serif;--mono:'DM Mono',ui-monospace,Menlo,monospace;
+  :root{--serif:'Baloo 2','Trebuchet MS',sans-serif;--mono:'Nunito','Avenir Next',Verdana,sans-serif;
+    --coral:#e8654f;--tealc:#1c5d5a;--goldc:#e9b949;--creamc:#f6ecca;--mintc:#a9d6ce;--pinkc:#f6c9c0;
     --bg:#f5efe3;--card:#fffdf8;--line:#e7ddca;--ink:#2d2820;--muted:#938974;
     --gold:#b8893a;--accent:#d4582f;--soft:#fbf6ec;
     --grad:linear-gradient(135deg,#FBB040,#F2674A,#F0506E);}
@@ -24,14 +28,14 @@
   .logo{width:46px;height:46px;border-radius:13px;box-shadow:0 6px 18px rgba(242,103,74,.22);display:block;flex:0 0 46px;}
   .brandtxt{flex:1;}
   .brandtxt h1{font-family:var(--serif);font-size:23px;font-weight:700;color:var(--ink);line-height:1;}
-  .brandtxt h1 em{font-style:italic;color:var(--accent);}
+  .brandtxt h1 em{font-style:normal;color:var(--accent);}
   .langsel{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:var(--mono);font-size:12px;color:var(--ink);color-scheme:light;outline:none;cursor:pointer;}
   .nav{font-size:11px;color:var(--muted);letter-spacing:.04em;cursor:pointer;}
   .nav:hover{color:var(--accent);}
 
   .hero{margin:26px 0 8px;}
-  .hero h2{font-family:var(--serif);font-size:clamp(26px,6vw,40px);font-weight:700;color:var(--ink);line-height:1.15;margin-bottom:18px;}
-  .hero h2 em{font-style:italic;color:var(--accent);}
+  .hero h2{font-family:var(--serif);font-size:clamp(27px,6.4vw,42px);font-weight:800;color:var(--ink);line-height:1.15;margin-bottom:18px;}
+  .hero h2 em{font-style:normal;color:var(--accent);}
   .lede{font-size:14px;color:#5e564a;line-height:1.75;margin-bottom:14px;}
   .lede b{color:var(--ink);font-weight:500;}
   .copyline{font-size:11px;color:#9a8f78;letter-spacing:.03em;margin-top:16px;border-inline-start:2px solid var(--line);padding-inline-start:12px;}
@@ -56,10 +60,14 @@
 
   .results{display:none;}
   .grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:6px;}
-  .stat{background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:14px 15px;}
-  .stat-l{font-size:9px;letter-spacing:.14em;color:var(--muted);text-transform:uppercase;margin-bottom:6px;}
-  .stat-v{font-family:var(--serif);font-size:27px;font-weight:700;color:var(--gold);line-height:1;letter-spacing:-1px;}
-  .stat.lead{grid-column:1/-1;}.stat.lead .stat-v{font-size:42px;color:var(--accent);}
+  .stat{border:none;border-radius:16px;padding:15px 17px;position:relative;overflow:hidden;box-shadow:0 3px 12px rgba(80,55,20,.10);}
+  .stat-l{font-size:10px;letter-spacing:.13em;text-transform:uppercase;font-weight:700;opacity:.85;margin-bottom:5px;}
+  .stat-v{font-family:var(--serif);font-size:27px;font-weight:800;line-height:1;letter-spacing:-.5px;}
+  .stat .ic{position:absolute;top:11px;inset-inline-end:13px;font-size:19px;opacity:.92;}
+  .stat.lead{grid-column:1/-1;}.stat.lead .stat-v{font-size:44px;}
+  .c-coral{background:var(--coral);color:#fff;}.c-teal{background:var(--tealc);color:#fff;}
+  .c-gold{background:var(--goldc);color:#4a3a10;}.c-cream{background:var(--creamc);color:#5a4a20;}
+  .c-mint{background:var(--mintc);color:#1c4a45;}.c-pink{background:var(--pinkc);color:#7a3a30;}
   .age-line{font-family:var(--serif);font-size:15px;color:#5e564a;margin:4px 0 14px;}.age-line b{color:var(--accent);}
 
   /* --- Encadré des prochains jouriversaires --- */
@@ -71,14 +79,43 @@
   .uprow .d{font-family:var(--serif);font-size:23px;font-weight:700;color:var(--accent);}
   .uprow .r{font-size:11px;color:#9a8f78;margin-inline-start:auto;}
 
-  .anec{background:linear-gradient(135deg,#fbf4e6,#f9efdf);border:1px solid #efe0c6;border-radius:12px;padding:16px;margin-top:12px;}
-  .anec .label{margin-bottom:8px;}
-  .anec-txt{font-family:var(--serif);font-style:italic;font-size:14px;line-height:1.6;color:#5a5142;}
+  /* --- Blocs enrichis (mesures, carte d'identité, surprise, blague) --- */
+  .xcard{background:#fffdf8;border:1px solid #ece0c8;border-radius:16px;padding:17px 18px;margin-top:14px;box-shadow:0 3px 14px rgba(80,55,20,.06);}
+  .xh{font-family:var(--serif);font-size:17px;font-weight:700;color:var(--ink);display:flex;align-items:center;gap:8px;margin-bottom:2px;}
+  .xsub{font-size:12px;color:#8a7f6a;margin-bottom:10px;}
+  .measure{display:flex;align-items:center;gap:13px;padding:10px 0;border-bottom:1px solid #f1e8d6;}
+  .measure:last-child{border-bottom:none;padding-bottom:2px;}
+  .measure .e{font-size:21px;width:30px;text-align:center;flex:0 0 30px;}
+  .mbig{font-family:var(--serif);font-size:18px;font-weight:700;color:var(--accent);}
+  .mtxt{font-size:13px;color:#5e564a;}
+  .idcard{border:2px solid var(--goldc);background:linear-gradient(135deg,#fdf6e4,#fcefd8);}
+  .idgrid{display:grid;grid-template-columns:1fr 1fr;gap:11px;margin-top:8px;}
+  .idcell{background:#fffdf8;border:1px solid #ecdcb8;border-radius:12px;padding:11px 13px;}
+  .idcell .k{font-size:10px;letter-spacing:.09em;text-transform:uppercase;color:#a08a50;margin-bottom:4px;font-weight:700;}
+  .idcell .val{font-family:var(--serif);font-size:16px;font-weight:600;color:var(--ink);}
+  .surprise{background:linear-gradient(135deg,var(--tealc),#164a47);color:#fff;border:none;}
+  .surprise .xh{color:#fff;}
+  .spbig{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--goldc);margin:6px 0;}
+  .surprise p{font-size:13.5px;color:#e6f0ee;line-height:1.65;}
+  .jokecard{background:linear-gradient(135deg,#fdeede,#fce6dd);border:1px solid #f2d3c4;}
+  .jk-q{font-family:var(--serif);font-size:14.5px;font-weight:600;color:#5a5142;line-height:1.6;margin-top:6px;}
+  .refresh{font-size:11px;color:var(--accent);font-weight:700;cursor:pointer;margin-inline-start:auto;font-family:var(--mono);}
+  /* --- Décorations statiques --- */
+  #view-home{position:relative;}
+  .deco{position:absolute;pointer-events:none;user-select:none;-webkit-user-select:none;z-index:-1;}
+  .deco-cal{top:-22px;inset-inline-end:-28px;width:min(44vw,340px);opacity:.92;}
+  .deco-confetti{inset-inline-start:-32px;top:590px;width:min(16vw,110px);opacity:.9;}
+  .deco-charts{inset-inline-end:-16px;bottom:-24px;width:min(36vw,260px);opacity:.95;}
+  @media(max-width:560px){
+    .deco-confetti{display:none;}
+    .deco-cal{width:52vw;top:-4px;opacity:.95;}
+    .deco-charts{width:36vw;}
+  }
 
   .item{display:flex;align-items:center;gap:13px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
   .item:hover{border-color:#e0b48f;}
   .ava{width:40px;height:40px;border-radius:50%;flex:0 0 40px;display:flex;align-items:center;justify-content:center;font-size:19px;background:#fff;border:1px solid var(--line);}
-  .it-name{font-family:var(--serif);font-size:17px;color:var(--ink);}
+  .it-name{font-family:var(--serif);font-size:17px;font-weight:600;color:var(--ink);}
   .it-sub{font-size:10px;color:var(--muted);margin-top:2px;}
   .it-days{margin-inline-start:auto;text-align:end;}
   .it-days b{font-family:var(--serif);font-size:20px;color:var(--gold);}
@@ -116,6 +153,9 @@
   </header>
 
   <section id="view-home">
+    <img class="deco deco-cal" src="deco-calendars.png" alt="" aria-hidden="true" />
+    <img class="deco deco-confetti" src="deco-confetti.png" alt="" aria-hidden="true" />
+    <img class="deco deco-charts" src="deco-charts.png" alt="" aria-hidden="true" />
     <div style="margin:2px 0 0"><span class="nav" id="list-back" style="display:none"></span></div>
     <div class="hero">
       <h2 id="hero-title"></h2>
@@ -137,9 +177,24 @@
           <div class="up-title" id="lbl-up"></div>
           <div id="r-up"></div>
         </div>
-        <div class="anec">
-          <div class="label"><span id="lbl-anec"></span> <span class="nav" id="anec-refresh" style="font-size:10px">↻</span></div>
-          <div class="anec-txt" id="anec-txt">…</div>
+        <div class="xcard" id="x-measures">
+          <div class="xh">🌍 <span id="ex-title"></span></div>
+          <div class="xsub" id="ex-sub"></div>
+          <div id="ex-rows"></div>
+        </div>
+        <div class="xcard idcard">
+          <div class="xh">🗓️ <span id="id-title"></span></div>
+          <div class="xsub" id="id-sub"></div>
+          <div class="idgrid" id="id-grid"></div>
+        </div>
+        <div class="xcard surprise">
+          <div class="xh">✨ <span id="sp-title"></span></div>
+          <div class="spbig" id="sp-big"></div>
+          <p id="sp-txt"></p>
+        </div>
+        <div class="xcard jokecard">
+          <div class="xh">😄 <span id="jk-title"></span> <span class="refresh" id="jk-refresh"></span></div>
+          <p class="jk-q" id="jk-txt"></p>
         </div>
       </div>
     </div>
@@ -442,8 +497,302 @@ const I18N={
   cDelDate:'حذف «{l}»؟',cDelAcc:'حذف حسابك وكل تواريخك نهائياً؟ لا يمكن التراجع.',accDeleted:'تم حذف حسابك وبياناتك.',newPass:'اختر كلمة مرور جديدة:',passUpd:'تم تحديث كلمة المرور.',
   legal:'<h4>إشعار قانوني وخصوصية</h4><p><b>الناشر:</b> SAS NEW-D — Georges Viana، سان مالو. contact@jouriversaire.com.</p><p><b>الاستضافة:</b> GitHub Pages؛ الحسابات وقاعدة البيانات على Supabase (منطقة الاتحاد الأوروبي).</p><h4>البيانات</h4><p>بدون حساب: لا يُحفظ شيء. مع حساب: بريدك وتواريخك فقط لتقديم خدمة الحفظ.</p><h4>حقوقك</h4><p>الوصول والتصحيح والنقل (تصدير) والمحو من «بياناتي». الأساس القانوني: الموافقة وتنفيذ الخدمة.</p><p>«Jouriversaire» مفهوم ومصطلح من ابتكار Georges Viana. © 2026.</p>'}
 };
-const LOCALES={fr:'fr-FR',en:'en-GB',es:'es-ES',pt:'pt-PT',pl:'pl-PL',de:'de-DE',it:'it-IT',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',ar:'ar'};
-const RTL={ar:1};
+/* ===== EXTRAS : nouveaux contenus + nouvelles langues (fusionnés dans I18N) ===== */
+const EXTRAS={
+fr:{exTitle:'À la mesure de vos jours',exSub:'Ce que ces {n} jours représentent vraiment',exHeart:'de battements de cœur',exBreath:'de respirations',exSun:'parcourus autour du Soleil',exMoon:'pleines lunes contemplées',exSleep:'passés à dormir',exSleepY:'près de {y} ans',exSummer:'étés déjà traversés',
+ idTitle:'Carte d\u2019identité temporelle',idSub:'Ce que dit cette date',kDow:'Jour de la semaine',kSeason:'Saison',kZodiac:'Signe astro',kChinese:'Zodiaque chinois',kMoon:'Lune ce jour-là',kDoy:'Jour de l\u2019année',
+ seasons:['Printemps','Été','Automne','Hiver'],
+ zodiac:['Bélier','Taureau','Gémeaux','Cancer','Lion','Vierge','Balance','Scorpion','Sagittaire','Capricorne','Verseau','Poissons'],
+ cnz:['Rat','Buffle','Tigre','Lapin','Dragon','Serpent','Cheval','Chèvre','Singe','Coq','Chien','Cochon'],
+ moonp:['Nouvelle lune','Premier croissant','Premier quartier','Gibbeuse croissante','Pleine lune','Gibbeuse décroissante','Dernier quartier','Dernier croissant'],
+ spTitle:'La surprise du prochain jouriversaire',spTxt:'Point de départ\u00a0: {s0}. Prochain palier\u00a0: {s1}, un {dow}\u00a0! Un jouriversaire ne tombe jamais là où on l\u2019attend.',
+ jkTitle:'La blague du jour',jkMore:'↻ une autre',
+ jokes:['Pourquoi les jouriversaires ne sont-ils jamais en retard\u00a0? Parce qu\u2019ils comptent chaque jour\u00a0!','Que dit un calendrier à un autre calendrier\u00a0? «\u00a0Tu comptes beaucoup pour moi.\u00a0»','Fêter ses 10\u202f000 jours est excellent pour la santé\u00a0: ceux qui en comptent le plus vivent le plus longtemps\u00a0!']},
+en:{exTitle:'The measure of your days',exSub:'What these {n} days really represent',exHeart:'heartbeats',exBreath:'breaths',exSun:'travelled around the Sun',exMoon:'full moons witnessed',exSleep:'spent sleeping',exSleepY:'nearly {y} years',exSummer:'summers lived through',
+ idTitle:'Time identity card',idSub:'What this date says',kDow:'Day of the week',kSeason:'Season',kZodiac:'Star sign',kChinese:'Chinese zodiac',kMoon:'Moon that day',kDoy:'Day of the year',
+ seasons:['Spring','Summer','Autumn','Winter'],
+ zodiac:['Aries','Taurus','Gemini','Cancer','Leo','Virgo','Libra','Scorpio','Sagittarius','Capricorn','Aquarius','Pisces'],
+ cnz:['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'],
+ moonp:['New moon','Waxing crescent','First quarter','Waxing gibbous','Full moon','Waning gibbous','Last quarter','Waning crescent'],
+ spTitle:'The next jouriversaire surprise',spTxt:'Starting point: {s0}. Next milestone: {s1}, on a {dow}! A jouriversaire never falls where you expect it.',
+ jkTitle:'Joke of the day',jkMore:'↻ another one',
+ jokes:['Why are jouriversaires never late? Because they count every single day!','What did one calendar say to the other? \u201cYou can count on me.\u201d','Celebrating 10,000 days is great for your health: people who count the most days live the longest!']},
+es:{exTitle:'A la medida de tus días',exSub:'Lo que estos {n} días representan de verdad',exHeart:'latidos del corazón',exBreath:'respiraciones',exSun:'recorridos alrededor del Sol',exMoon:'lunas llenas contempladas',exSleep:'pasados durmiendo',exSleepY:'casi {y} años',exSummer:'veranos vividos',
+ idTitle:'Carné de identidad temporal',idSub:'Lo que dice esta fecha',kDow:'Día de la semana',kSeason:'Estación',kZodiac:'Signo del zodiaco',kChinese:'Zodiaco chino',kMoon:'Luna ese día',kDoy:'Día del año',
+ seasons:['Primavera','Verano','Otoño','Invierno'],
+ zodiac:['Aries','Tauro','Géminis','Cáncer','Leo','Virgo','Libra','Escorpio','Sagitario','Capricornio','Acuario','Piscis'],
+ cnz:['Rata','Buey','Tigre','Conejo','Dragón','Serpiente','Caballo','Cabra','Mono','Gallo','Perro','Cerdo'],
+ moonp:['Luna nueva','Luna creciente','Cuarto creciente','Gibosa creciente','Luna llena','Gibosa menguante','Cuarto menguante','Luna menguante'],
+ spTitle:'La sorpresa del próximo jouriversaire',spTxt:'Punto de partida: {s0}. Próximo hito: {s1}, un {dow}. ¡Un jouriversaire nunca cae donde lo esperas!',
+ jkTitle:'La broma del día',jkMore:'↻ otra',
+ jokes:['¿Por qué los jouriversaires nunca llegan tarde? ¡Porque cuentan cada día!','¿Qué le dijo un calendario a otro? «Cuentas mucho para mí.»','Celebrar 10.000 días es bueno para la salud: ¡quienes más días cuentan, más viven!']},
+pt:{exTitle:'À medida dos seus dias',exSub:'O que estes {n} dias representam de verdade',exHeart:'batimentos cardíacos',exBreath:'respirações',exSun:'percorridos à volta do Sol',exMoon:'luas cheias contempladas',exSleep:'passados a dormir',exSleepY:'quase {y} anos',exSummer:'verões vividos',
+ idTitle:'Cartão de identidade temporal',idSub:'O que diz esta data',kDow:'Dia da semana',kSeason:'Estação',kZodiac:'Signo',kChinese:'Zodíaco chinês',kMoon:'Lua nesse dia',kDoy:'Dia do ano',
+ seasons:['Primavera','Verão','Outono','Inverno'],
+ zodiac:['Carneiro','Touro','Gémeos','Caranguejo','Leão','Virgem','Balança','Escorpião','Sagitário','Capricórnio','Aquário','Peixes'],
+ cnz:['Rato','Búfalo','Tigre','Coelho','Dragão','Serpente','Cavalo','Cabra','Macaco','Galo','Cão','Porco'],
+ moonp:['Lua nova','Crescente','Quarto crescente','Gibosa crescente','Lua cheia','Gibosa minguante','Quarto minguante','Minguante'],
+ spTitle:'A surpresa do próximo jouriversaire',spTxt:'Ponto de partida: {s0}. Próximo marco: {s1} ({dow})! Um jouriversaire nunca cai onde se espera.',
+ jkTitle:'A piada do dia',jkMore:'↻ outra',
+ jokes:['Porque é que os jouriversaires nunca se atrasam? Porque contam todos os dias!','O que disse um calendário ao outro? «Contas muito para mim.»','Festejar 10.000 dias faz bem à saúde: quem conta mais dias vive mais tempo!']},
+pl:{exTitle:'Miara twoich dni',exSub:'Co naprawdę oznacza te {n} dni',exHeart:'uderzeń serca',exBreath:'oddechów',exSun:'przebytych wokół Słońca',exMoon:'obejrzanych pełni Księżyca',exSleep:'przespanych',exSleepY:'prawie {y} lat',exSummer:'przeżytych pór letnich',
+ idTitle:'Czasowy dowód osobisty',idSub:'Co mówi ta data',kDow:'Dzień tygodnia',kSeason:'Pora roku',kZodiac:'Znak zodiaku',kChinese:'Chiński zodiak',kMoon:'Księżyc tego dnia',kDoy:'Dzień roku',
+ seasons:['Wiosna','Lato','Jesień','Zima'],
+ zodiac:['Baran','Byk','Bliźnięta','Rak','Lew','Panna','Waga','Skorpion','Strzelec','Koziorożec','Wodnik','Ryby'],
+ cnz:['Szczur','Bawół','Tygrys','Królik','Smok','Wąż','Koń','Koza','Małpa','Kogut','Pies','Świnia'],
+ moonp:['Nów','Sierp przybywający','Pierwsza kwadra','Garb przybywający','Pełnia','Garb ubywający','Ostatnia kwadra','Sierp ubywający'],
+ spTitle:'Niespodzianka następnego jouriversaire',spTxt:'Data początkowa: {s0}. Następny kamień milowy: {s1}, {dow}! Jouriversaire nigdy nie wypada tam, gdzie się go spodziewasz.',
+ jkTitle:'Żart dnia',jkMore:'↻ inny',
+ jokes:['Dlaczego jouriversaire nigdy się nie spóźnia? Bo liczy każdy dzień!','Co powiedział jeden kalendarz drugiemu? \u201eMożna na tobie polegać każdego dnia.\u201d','Świętowanie 10 000 dni jest zdrowe: kto liczy najwięcej dni, żyje najdłużej!']},
+de:{exTitle:'Das Maß deiner Tage',exSub:'Was diese {n} Tage wirklich bedeuten',exHeart:'Herzschläge',exBreath:'Atemzüge',exSun:'um die Sonne zurückgelegt',exMoon:'Vollmonde erlebt',exSleep:'verschlafen',exSleepY:'fast {y} Jahre',exSummer:'Sommer erlebt',
+ idTitle:'Zeitlicher Steckbrief',idSub:'Was dieses Datum verrät',kDow:'Wochentag',kSeason:'Jahreszeit',kZodiac:'Sternzeichen',kChinese:'Chinesisches Tierkreiszeichen',kMoon:'Mond an dem Tag',kDoy:'Tag des Jahres',
+ seasons:['Frühling','Sommer','Herbst','Winter'],
+ zodiac:['Widder','Stier','Zwillinge','Krebs','Löwe','Jungfrau','Waage','Skorpion','Schütze','Steinbock','Wassermann','Fische'],
+ cnz:['Ratte','Büffel','Tiger','Hase','Drache','Schlange','Pferd','Ziege','Affe','Hahn','Hund','Schwein'],
+ moonp:['Neumond','Zunehmende Sichel','Erstes Viertel','Zunehmender Mond','Vollmond','Abnehmender Mond','Letztes Viertel','Abnehmende Sichel'],
+ spTitle:'Die Überraschung des nächsten Jouriversaire',spTxt:'Startdatum: {s0}. Nächster Meilenstein: {s1}, ein {dow}! Ein Jouriversaire fällt nie dahin, wo man es erwartet.',
+ jkTitle:'Witz des Tages',jkMore:'↻ noch einer',
+ jokes:['Warum kommt ein Jouriversaire nie zu spät? Weil es jeden Tag zählt!','Was sagt ein Kalender zum anderen? \u201eAuf dich kann man zählen.\u201c','10.000 Tage zu feiern ist gesund: Wer die meisten Tage zählt, lebt am längsten!']},
+it:{exTitle:'La misura dei tuoi giorni',exSub:'Cosa rappresentano davvero questi {n} giorni',exHeart:'battiti del cuore',exBreath:'respiri',exSun:'percorsi intorno al Sole',exMoon:'lune piene ammirate',exSleep:'passati a dormire',exSleepY:'quasi {y} anni',exSummer:'estati vissute',
+ idTitle:'Carta d\u2019identità temporale',idSub:'Cosa dice questa data',kDow:'Giorno della settimana',kSeason:'Stagione',kZodiac:'Segno zodiacale',kChinese:'Zodiaco cinese',kMoon:'Luna quel giorno',kDoy:'Giorno dell\u2019anno',
+ seasons:['Primavera','Estate','Autunno','Inverno'],
+ zodiac:['Ariete','Toro','Gemelli','Cancro','Leone','Vergine','Bilancia','Scorpione','Sagittario','Capricorno','Acquario','Pesci'],
+ cnz:['Topo','Bue','Tigre','Coniglio','Drago','Serpente','Cavallo','Capra','Scimmia','Gallo','Cane','Maiale'],
+ moonp:['Luna nuova','Falce crescente','Primo quarto','Gibbosa crescente','Luna piena','Gibbosa calante','Ultimo quarto','Falce calante'],
+ spTitle:'La sorpresa del prossimo jouriversaire',spTxt:'Punto di partenza: {s0}. Prossimo traguardo: {s1}, un {dow}! Un jouriversaire non cade mai dove te lo aspetti.',
+ jkTitle:'La battuta del giorno',jkMore:'↻ un\u2019altra',
+ jokes:['Perché i jouriversaires non sono mai in ritardo? Perché contano ogni giorno!','Cosa dice un calendario all\u2019altro? «Puoi contare su di me.»','Festeggiare 10.000 giorni fa bene alla salute: chi conta più giorni vive più a lungo!']},
+zh:{exTitle:'用天数丈量人生',exSub:'这 {n} 天真正意味着什么',exHeart:'次心跳',exBreath:'次呼吸',exSun:'随地球绕太阳飞行',exMoon:'次满月',exSleep:'用于睡眠',exSleepY:'近 {y} 年',exSummer:'个夏天',
+ idTitle:'时间身份卡',idSub:'这个日期告诉你的事',kDow:'星期',kSeason:'季节',kZodiac:'星座',kChinese:'生肖',kMoon:'当天的月相',kDoy:'年内第几天',
+ seasons:['春','夏','秋','冬'],
+ zodiac:['白羊座','金牛座','双子座','巨蟹座','狮子座','处女座','天秤座','天蝎座','射手座','摩羯座','水瓶座','双鱼座'],
+ cnz:['鼠','牛','虎','兔','龙','蛇','马','羊','猴','鸡','狗','猪'],
+ moonp:['新月','娥眉月','上弦月','盈凸月','满月','亏凸月','下弦月','残月'],
+ spTitle:'下一个千日纪念的惊喜',spTxt:'起始日期：{s0}。下一个里程碑：{s1}的{dow}！千日纪念从不落在你预料的地方。',
+ jkTitle:'每日一笑',jkMore:'↻ 换一个',
+ jokes:['为什么千日纪念从不迟到？因为它每天都在数日子！','一本日历对另一本日历说什么？\u201c你对我来说很重要，每天都算数。\u201d','庆祝一万天有益健康：数的日子越多，活得越久！']},
+ja:{exTitle:'あなたの日々のものさし',exSub:'この {n} 日が本当に意味するもの',exHeart:'回の心拍',exBreath:'回の呼吸',exSun:'太陽の周りを移動',exMoon:'回の満月',exSleep:'を睡眠に',exSleepY:'約 {y} 年',exSummer:'回の夏',
+ idTitle:'時間のプロフィール',idSub:'この日付が語ること',kDow:'曜日',kSeason:'季節',kZodiac:'星座',kChinese:'干支',kMoon:'その日の月',kDoy:'年間通算日',
+ seasons:['春','夏','秋','冬'],
+ zodiac:['牡羊座','牡牛座','双子座','蟹座','獅子座','乙女座','天秤座','蠍座','射手座','山羊座','水瓶座','魚座'],
+ cnz:['ねずみ','うし','とら','うさぎ','たつ','へび','うま','ひつじ','さる','とり','いぬ','いのしし'],
+ moonp:['新月','三日月','上弦の月','満ちていく月','満月','欠けていく月','下弦の月','細い月'],
+ spTitle:'次の節目のサプライズ',spTxt:'始まりの日は{s0}。次の節目は{s1}の{dow}に！節目は思いがけない時にやって来ます。',
+ jkTitle:'今日のジョーク',jkMore:'↻ もう一つ',
+ jokes:['節目の日はなぜ遅れない？ 毎日ちゃんと数えているから！','カレンダーがカレンダーに言った一言は？「君は毎日頼りになるね」','10,000日を祝うのは健康にいい：日を多く数える人ほど長生きします！']},
+ko:{exTitle:'당신의 날들의 무게',exSub:'이 {n}일이 진짜 의미하는 것',exHeart:'번의 심장 박동',exBreath:'번의 호흡',exSun:'태양 주위를 이동',exMoon:'번의 보름달',exSleep:'을 잠으로',exSleepY:'약 {y}년',exSummer:'번의 여름',
+ idTitle:'시간 신분증',idSub:'이 날짜가 말해주는 것',kDow:'요일',kSeason:'계절',kZodiac:'별자리',kChinese:'띠',kMoon:'그날의 달',kDoy:'연중 일수',
+ seasons:['봄','여름','가을','겨울'],
+ zodiac:['양자리','황소자리','쌍둥이자리','게자리','사자자리','처녀자리','천칭자리','전갈자리','사수자리','염소자리','물병자리','물고기자리'],
+ cnz:['쥐','소','호랑이','토끼','용','뱀','말','양','원숭이','닭','개','돼지'],
+ moonp:['삭(새달)','초승달','상현달','차가는 달','보름달','기우는 달','하현달','그믐달'],
+ spTitle:'다음 이정표의 서프라이즈',spTxt:'시작 날짜: {s0}. 다음 이정표: {s1}의 {dow}! 이정표는 늘 예상 밖의 순간에 찾아옵니다.',
+ jkTitle:'오늘의 유머',jkMore:'↻ 다른 것',
+ jokes:['이정표는 왜 절대 늦지 않을까요? 매일매일 세고 있으니까요!','달력이 달력에게 뭐라고 했을까요? \u201c넌 매일 믿음직해.\u201d','10,000일을 축하하면 건강에 좋아요: 날을 많이 세는 사람이 가장 오래 삽니다!']},
+ar:{exTitle:'مقياس أيامك',exSub:'ما تمثله هذه الـ {n} يوماً حقاً',exHeart:'نبضة قلب',exBreath:'نَفَس',exSun:'مقطوعة حول الشمس',exMoon:'بدراً شاهدته',exSleep:'قضيتها نائماً',exSleepY:'قرابة {y} سنة',exSummer:'صيفاً عشته',
+ idTitle:'بطاقة الهوية الزمنية',idSub:'ما يقوله هذا التاريخ',kDow:'يوم الأسبوع',kSeason:'الفصل',kZodiac:'البرج',kChinese:'البرج الصيني',kMoon:'القمر في ذلك اليوم',kDoy:'اليوم من السنة',
+ seasons:['الربيع','الصيف','الخريف','الشتاء'],
+ zodiac:['الحمل','الثور','الجوزاء','السرطان','الأسد','العذراء','الميزان','العقرب','القوس','الجدي','الدلو','الحوت'],
+ cnz:['الفأر','الثور','النمر','الأرنب','التنين','الأفعى','الحصان','الماعز','القرد','الديك','الكلب','الخنزير'],
+ moonp:['محاق','هلال متزايد','تربيع أول','أحدب متزايد','بدر','أحدب متناقص','تربيع أخير','هلال متناقص'],
+ spTitle:'مفاجأة المناسبة القادمة',spTxt:'نقطة البداية: {s0}. المحطة القادمة: {s1}، يوم {dow}! المناسبة الألفية لا تأتي أبداً حيث تتوقعها.',
+ jkTitle:'نكتة اليوم',jkMore:'↻ أخرى',
+ jokes:['لماذا لا تتأخر المناسبات الألفية أبداً؟ لأنها تحسب كل يوم!','ماذا قال تقويم لتقويم آخر؟ «أعتمد عليك كل يوم.»','الاحتفال بـ 10000 يوم مفيد للصحة: من يعدّ أياماً أكثر يعيش أطول!']},
+/* ===== NOUVELLES LANGUES ===== */
+he:{lang:'עברית',navAccount:'‹ החשבון שלי',heroT:'ומה אם תספרו את הימים,|ולא רק את השנים?',
+ lede1:'<b>Jouriversaire</b> הוא היום שבו מונה הימים שלכם חוצה ציון דרך עגול: 10,000 ימים, 20,000 ימים, 25,000 ימים…',
+ lede2:'אלפי הימים האלה <b>נדירים יותר</b> ובעיקר <b>בלתי צפויים</b>: בניגוד ליום ההולדת, שתמיד באותה עונה, jouriversaire אחד יכול ליפול בשיא הקיץ והבא בעיצומו של החורף. כל אחד הוא הפתעה אמיתית — הזדמנות לחגוג במקום שלא מצפים לו.',
+ copy:'"Jouriversaire" — רעיון ומונח שנוצרו על ידי Georges Viana. \u00a9 2026 Georges Viana. כל הזכויות שמורות.',
+ calc:'חשבו את ה-jouriversaires שלכם',fDate:'תאריך',fTime:'שעה (לא חובה)',
+ lifeTpl:'<b>{y}</b> שנים \u00b7 <b>{m}</b> חודשים \u00b7 <b>{d}</b> ימים',upLabel:'ציוני הדרך הקרובים',daysWord:'ימים',inDays:'בעוד {n} ימים',
+ uJours:'ימים',uSemaines:'שבועות',uMois:'חודשים',uAnnees:'שנים',uHeures:'שעות',uMinutes:'דקות',uSecondes:'שניות',
+ keep:'שמרו את התאריכים שלכם',keepDesc:'צרו חשבון חינם כדי <b>לשמור את התאריכים שלכם ושל המשפחה</b> ולמצוא אותם בכל התחברות, בכל המכשירים.',createAcc:'יצירת חשבון חינם',
+ backCalc:'חזרה למחשבון ›',tabLogin:'התחברות',tabSignup:'הרשמה',fEmail:'אימייל',fPass:'סיסמה',btnLogin:'התחברות',btnSignup:'יצירת החשבון שלי',forgot:'שכחתם סיסמה?',
+ consent:'ביצירת חשבון אתם מסכימים שהאימייל והתאריכים שלכם יישמרו לצורך מתן השירות (ראו {link}).',consentLink:'פרטיות',
+ connected:'מחוברים:',logout:'התנתקות',addDate:'הוספת תאריך',dLabel:'שם',dLabelPh:'חתונה, הולדת טריסטן…',dType:'סוג',
+ tNaissance:'🎂 לידה',tMariage:'💍 חתונה',tRencontre:'❤️ מפגש',tAutre:'✦ אחר',save:'＋ שמירה',myDates:'התאריכים שלי',noDates:'עוד אין תאריכים שמורים.',
+ myData:'הנתונים שלי',rgpdDesc:'תוכלו בכל עת לייצא את הנתונים או למחוק לצמיתות את החשבון ואת כל התאריכים.',exportData:'⬆ ייצוא (CSV)',importBtn:'⬇ ייבוא (CSV)',importedMsg:'יובאו {n} תאריכים.',csvErr:'לא ניתן לקרוא את קובץ ה-CSV.',deleteAcc:'מחיקת החשבון',
+ back:'חזרה ›',footTag:'Jouriversaire — חגגו את אלפי הימים שלכם.',footLegal:'מידע משפטי ופרטיות',
+ mPreview:'החשבונות יפעלו לאחר פרסום האתר עם פרויקט ה-Supabase שלכם. המחשבון כבר פועל.',mFields:'נדרשים אימייל וסיסמה.',mInvalid:'פרטי התחברות שגויים.',
+ mCreated:'החשבון נוצר! בדקו את תיבת הדואר ולחצו על קישור האישור.',mReset:'נשלח אימייל לאיפוס.',mFieldsReq:'נדרשים שם ותאריך.',mEmailFirst:'הזינו קודם את האימייל.',
+ cDelDate:'למחוק את "{l}"?',cDelAcc:'למחוק לצמיתות את החשבון ואת כל התאריכים? פעולה בלתי הפיכה.',accDeleted:'החשבון והנתונים נמחקו.',newPass:'בחרו סיסמה חדשה:',passUpd:'הסיסמה עודכנה.',
+ legal:'<h4>מידע משפטי ופרטיות</h4><p><b>המוציא לאור:</b> SAS NEW-D — Georges Viana, סן-מאלו. contact@jouriversaire.com.</p><p><b>אחסון:</b> GitHub Pages; חשבונות ומסד נתונים ב-Supabase (אזור האיחוד האירופי).</p><h4>נתונים</h4><p>ללא חשבון: דבר אינו נשמר. עם חשבון: האימייל והתאריכים שלכם, אך ורק לצורך שירות השמירה.</p><h4>הזכויות שלכם</h4><p>גישה, תיקון, ניידות (ייצוא) ומחיקה דרך "הנתונים שלי". בסיס משפטי: הסכמה וביצוע השירות.</p><p>"Jouriversaire" — רעיון ומונח של Georges Viana. \u00a9 2026.</p>',
+ exTitle:'מידת הימים שלכם',exSub:'מה {n} הימים האלה באמת מייצגים',exHeart:'פעימות לב',exBreath:'נשימות',exSun:'סביב השמש',exMoon:'ירחים מלאים',exSleep:'בשינה',exSleepY:'כמעט {y} שנים',exSummer:'קיצים שחלפו',
+ idTitle:'תעודת זהות של זמן',idSub:'מה התאריך הזה מספר',kDow:'יום בשבוע',kSeason:'עונה',kZodiac:'מזל',kChinese:'גלגל המזלות הסיני',kMoon:'הירח באותו יום',kDoy:'יום בשנה',
+ seasons:['אביב','קיץ','סתיו','חורף'],
+ zodiac:['טלה','שור','תאומים','סרטן','אריה','בתולה','מאזניים','עקרב','קשת','גדי','דלי','דגים'],
+ cnz:['עכברוש','שור','נמר','ארנב','דרקון','נחש','סוס','עז','קוף','תרנגול','כלב','חזיר'],
+ moonp:['מולד','סהר מתמלא','רבע ראשון','גיבן מתמלא','ירח מלא','גיבן מתמעט','רבע אחרון','סהר מתמעט'],
+ spTitle:'ההפתעה של ציון הדרך הבא',spTxt:'נקודת ההתחלה: {s0}. ציון הדרך הבא: {s1}, ביום {dow}! Jouriversaire אף פעם לא נופל היכן שמצפים לו.',
+ jkTitle:'הבדיחה היומית',jkMore:'↻ עוד אחת',
+ jokes:['למה jouriversaire אף פעם לא מאחר? כי הוא סופר כל יום!','מה אמר לוח שנה ללוח שנה אחר? "אפשר לסמוך עליך כל יום."','לחגוג 10,000 ימים זה בריא: מי שסופר הכי הרבה ימים חי הכי הרבה זמן!']},
+ru:{lang:'Русский',navAccount:'Мой аккаунт ›',heroT:'А что, если считать дни,|а не только годы?',
+ lede1:'<b>Jouriversaire</b> — это день, когда ваш счётчик дней пересекает круглую отметку: 10\u202f000 дней, 20\u202f000 дней, 25\u202f000 дней…',
+ lede2:'Эти тысячи дней <b>случаются реже</b> и, главное, <b>непредсказуемы</b>: в отличие от дня рождения, который всегда в одном сезоне, один jouriversaire может выпасть на разгар лета, а следующий — на середину зимы. Каждый — настоящий сюрприз и повод отпраздновать там, где не ждёшь.',
+ copy:'«Jouriversaire» — концепция и термин созданы Georges Viana. \u00a9 2026 Georges Viana. Все права защищены.',
+ calc:'Рассчитайте свои jouriversaires',fDate:'Дата',fTime:'Время (необязательно)',
+ lifeTpl:'<b>{y}</b> лет \u00b7 <b>{m}</b> мес. \u00b7 <b>{d}</b> дн.',upLabel:'Ближайшие jouriversaires',daysWord:'дней',inDays:'через {n} дней',
+ uJours:'Дни',uSemaines:'Недели',uMois:'Месяцы',uAnnees:'Годы',uHeures:'Часы',uMinutes:'Минуты',uSecondes:'Секунды',
+ keep:'Сохраните свои даты',keepDesc:'Создайте бесплатный аккаунт, чтобы <b>сохранять свои даты и даты близких</b> и находить их при каждом входе на всех устройствах.',createAcc:'Создать бесплатный аккаунт',
+ backCalc:'‹ Назад к калькулятору',tabLogin:'Вход',tabSignup:'Регистрация',fEmail:'Эл. почта',fPass:'Пароль',btnLogin:'Войти',btnSignup:'Создать аккаунт',forgot:'Забыли пароль?',
+ consent:'Создавая аккаунт, вы соглашаетесь на хранение вашей почты и дат для предоставления сервиса (см. {link}).',consentLink:'конфиденциальность',
+ connected:'Вы вошли:',logout:'Выйти',addDate:'Добавить дату',dLabel:'Название',dLabelPh:'Свадьба, рождение Тристана…',dType:'Тип',
+ tNaissance:'🎂 Рождение',tMariage:'💍 Свадьба',tRencontre:'❤️ Встреча',tAutre:'✦ Другое',save:'＋ Сохранить',myDates:'Мои даты',noDates:'Пока нет сохранённых дат.',
+ myData:'Мои данные',rgpdDesc:'Вы можете в любой момент экспортировать данные или навсегда удалить аккаунт и все даты.',exportData:'⬆ Экспорт (CSV)',importBtn:'⬇ Импорт (CSV)',importedMsg:'Импортировано дат: {n}.',csvErr:'Не удаётся прочитать CSV-файл.',deleteAcc:'Удалить аккаунт',
+ back:'‹ Назад',footTag:'Jouriversaire — отпразднуйте свои тысячи дней.',footLegal:'Правовая информация и конфиденциальность',
+ mPreview:'Аккаунты заработают после публикации сайта с вашим проектом Supabase. Калькулятор уже работает.',mFields:'Нужны почта и пароль.',mInvalid:'Неверные данные для входа.',
+ mCreated:'Аккаунт создан! Проверьте почту и перейдите по ссылке подтверждения.',mReset:'Письмо для сброса отправлено.',mFieldsReq:'Нужны название и дата.',mEmailFirst:'Сначала введите почту.',
+ cDelDate:'Удалить «{l}»?',cDelAcc:'НАВСЕГДА удалить аккаунт и все даты? Действие необратимо.',accDeleted:'Аккаунт и данные удалены.',newPass:'Выберите новый пароль:',passUpd:'Пароль обновлён.',
+ legal:'<h4>Правовая информация и конфиденциальность</h4><p><b>Издатель:</b> SAS NEW-D — Georges Viana, Сен-Мало. contact@jouriversaire.com.</p><p><b>Хостинг:</b> GitHub Pages; аккаунты и база данных — Supabase (регион ЕС).</p><h4>Данные</h4><p>Без аккаунта: ничего не сохраняется. С аккаунтом: почта и даты — только для сервиса сохранения.</p><h4>Ваши права</h4><p>Доступ, исправление, перенос (экспорт) и удаление в разделе «Мои данные». Правовое основание: согласие и исполнение услуги.</p><p>«Jouriversaire» — концепция и термин: Georges Viana. \u00a9 2026.</p>',
+ exTitle:'Мера ваших дней',exSub:'Что на самом деле означают эти {n} дней',exHeart:'ударов сердца',exBreath:'вдохов',exSun:'пройдено вокруг Солнца',exMoon:'полнолуний увидено',exSleep:'проведено во сне',exSleepY:'почти {y} лет',exSummer:'прожитых летних сезонов',
+ idTitle:'Временное удостоверение',idSub:'О чём говорит эта дата',kDow:'День недели',kSeason:'Время года',kZodiac:'Знак зодиака',kChinese:'Китайский зодиак',kMoon:'Луна в тот день',kDoy:'День года',
+ seasons:['Весна','Лето','Осень','Зима'],
+ zodiac:['Овен','Телец','Близнецы','Рак','Лев','Дева','Весы','Скорпион','Стрелец','Козерог','Водолей','Рыбы'],
+ cnz:['Крыса','Бык','Тигр','Кролик','Дракон','Змея','Лошадь','Коза','Обезьяна','Петух','Собака','Свинья'],
+ moonp:['Новолуние','Растущий серп','Первая четверть','Растущая луна','Полнолуние','Убывающая луна','Последняя четверть','Убывающий серп'],
+ spTitle:'Сюрприз следующего jouriversaire',spTxt:'Начальная дата: {s0}. Следующая отметка: {s1}, {dow}! Jouriversaire никогда не выпадает там, где его ждёшь.',
+ jkTitle:'Шутка дня',jkMore:'↻ ещё одну',
+ jokes:['Почему jouriversaire никогда не опаздывает? Потому что считает каждый день!','Что сказал один календарь другому? «На тебя можно рассчитывать каждый день».','Отмечать 10 000 дней полезно для здоровья: кто насчитал больше дней, тот дольше живёт!']},
+uk:{lang:'Українська',navAccount:'Мій акаунт ›',heroT:'А якщо рахувати дні,|а не лише роки?',
+ lede1:'<b>Jouriversaire</b> — це день, коли ваш лічильник днів перетинає круглу позначку: 10\u202f000 днів, 20\u202f000 днів, 25\u202f000 днів…',
+ lede2:'Ці тисячі днів <b>трапляються рідше</b> і, головне, <b>непередбачувані</b>: на відміну від дня народження, що завжди в одному сезоні, один jouriversaire може випасти в розпал літа, а наступний — посеред зими. Кожен — справжній сюрприз і нагода святкувати там, де не чекаєш.',
+ copy:'«Jouriversaire» — концепція і термін створені Georges Viana. \u00a9 2026 Georges Viana. Усі права захищені.',
+ calc:'Розрахуйте свої jouriversaires',fDate:'Дата',fTime:'Час (необов\u2019язково)',
+ lifeTpl:'<b>{y}</b> років \u00b7 <b>{m}</b> міс. \u00b7 <b>{d}</b> дн.',upLabel:'Найближчі jouriversaires',daysWord:'днів',inDays:'через {n} днів',
+ uJours:'Дні',uSemaines:'Тижні',uMois:'Місяці',uAnnees:'Роки',uHeures:'Години',uMinutes:'Хвилини',uSecondes:'Секунди',
+ keep:'Збережіть свої дати',keepDesc:'Створіть безкоштовний акаунт, щоб <b>зберігати свої дати та дати рідних</b> і знаходити їх під час кожного входу на всіх пристроях.',createAcc:'Створити безкоштовний акаунт',
+ backCalc:'‹ Назад до калькулятора',tabLogin:'Вхід',tabSignup:'Реєстрація',fEmail:'Ел. пошта',fPass:'Пароль',btnLogin:'Увійти',btnSignup:'Створити акаунт',forgot:'Забули пароль?',
+ consent:'Створюючи акаунт, ви погоджуєтеся на зберігання вашої пошти та дат для надання сервісу (див. {link}).',consentLink:'конфіденційність',
+ connected:'Ви увійшли:',logout:'Вийти',addDate:'Додати дату',dLabel:'Назва',dLabelPh:'Весілля, народження Трістана…',dType:'Тип',
+ tNaissance:'🎂 Народження',tMariage:'💍 Весілля',tRencontre:'❤️ Зустріч',tAutre:'✦ Інше',save:'＋ Зберегти',myDates:'Мої дати',noDates:'Поки що немає збережених дат.',
+ myData:'Мої дані',rgpdDesc:'Ви можете будь-коли експортувати дані або назавжди видалити акаунт і всі дати.',exportData:'⬆ Експорт (CSV)',importBtn:'⬇ Імпорт (CSV)',importedMsg:'Імпортовано дат: {n}.',csvErr:'Не вдається прочитати файл CSV.',deleteAcc:'Видалити акаунт',
+ back:'‹ Назад',footTag:'Jouriversaire — святкуйте свої тисячі днів.',footLegal:'Правова інформація та конфіденційність',
+ mPreview:'Акаунти запрацюють після публікації сайту з вашим проєктом Supabase. Калькулятор уже працює.',mFields:'Потрібні пошта і пароль.',mInvalid:'Невірні дані для входу.',
+ mCreated:'Акаунт створено! Перевірте пошту та перейдіть за посиланням підтвердження.',mReset:'Лист для скидання надіслано.',mFieldsReq:'Потрібні назва і дата.',mEmailFirst:'Спершу введіть пошту.',
+ cDelDate:'Видалити «{l}»?',cDelAcc:'НАЗАВЖДИ видалити акаунт і всі дати? Дію не можна скасувати.',accDeleted:'Акаунт і дані видалено.',newPass:'Оберіть новий пароль:',passUpd:'Пароль оновлено.',
+ legal:'<h4>Правова інформація та конфіденційність</h4><p><b>Видавець:</b> SAS NEW-D — Georges Viana, Сен-Мало. contact@jouriversaire.com.</p><p><b>Хостинг:</b> GitHub Pages; акаунти та база даних — Supabase (регіон ЄС).</p><h4>Дані</h4><p>Без акаунта: нічого не зберігається. З акаунтом: пошта і дати — лише для сервісу збереження.</p><h4>Ваші права</h4><p>Доступ, виправлення, перенесення (експорт) і видалення в розділі «Мої дані». Правова підстава: згода та виконання послуги.</p><p>«Jouriversaire» — концепція і термін: Georges Viana. \u00a9 2026.</p>',
+ exTitle:'Міра ваших днів',exSub:'Що насправді означають ці {n} днів',exHeart:'ударів серця',exBreath:'вдихів',exSun:'пройдено навколо Сонця',exMoon:'повних місяців побачено',exSleep:'проведено уві сні',exSleepY:'майже {y} років',exSummer:'прожитих літніх сезонів',
+ idTitle:'Часове посвідчення',idSub:'Про що говорить ця дата',kDow:'День тижня',kSeason:'Пора року',kZodiac:'Знак зодіаку',kChinese:'Китайський зодіак',kMoon:'Місяць того дня',kDoy:'День року',
+ seasons:['Весна','Літо','Осінь','Зима'],
+ zodiac:['Овен','Телець','Близнюки','Рак','Лев','Діва','Терези','Скорпіон','Стрілець','Козоріг','Водолій','Риби'],
+ cnz:['Щур','Бик','Тигр','Кролик','Дракон','Змія','Кінь','Коза','Мавпа','Півень','Собака','Свиня'],
+ moonp:['Новий місяць','Молодик','Перша чверть','Зростаючий місяць','Повний місяць','Спадний місяць','Остання чверть','Старий серп'],
+ spTitle:'Сюрприз наступного jouriversaire',spTxt:'Початкова дата: {s0}. Наступна позначка: {s1}, {dow}! Jouriversaire ніколи не випадає там, де на нього чекаєш.',
+ jkTitle:'Жарт дня',jkMore:'↻ ще один',
+ jokes:['Чому jouriversaire ніколи не запізнюється? Бо рахує кожен день!','Що сказав один календар іншому? «На тебе можна розраховувати щодня».','Святкувати 10 000 днів корисно для здоров\u2019я: хто нарахував більше днів, той довше живе!']},
+el:{lang:'Ελληνικά',navAccount:'Ο λογαριασμός μου ›',heroT:'Κι αν μετρούσατε τις μέρες σας,|όχι μόνο τα χρόνια σας;',
+ lede1:'Το <b>jouriversaire</b> είναι η μέρα που ο μετρητής των ημερών σας περνά ένα στρογγυλό ορόσημο: 10.000 μέρες, 20.000 μέρες, 25.000 μέρες…',
+ lede2:'Αυτές οι χιλιάδες μέρες είναι <b>πιο σπάνιες</b> και κυρίως <b>απρόβλεπτες</b>: σε αντίθεση με τα γενέθλιά σας, πάντα την ίδια εποχή, ένα jouriversaire μπορεί να πέσει μέσα στο καλοκαίρι και το επόμενο μέσα στον χειμώνα. Καθένα είναι μια πραγματική έκπληξη — μια ευκαιρία να γιορτάσετε εκεί που δεν το περιμένετε.',
+ copy:'«Jouriversaire» — ιδέα και όρος του Georges Viana. \u00a9 2026 Georges Viana. Με την επιφύλαξη παντός δικαιώματος.',
+ calc:'Υπολογίστε τα jouriversaires σας',fDate:'Ημερομηνία',fTime:'Ώρα (προαιρετικά)',
+ lifeTpl:'<b>{y}</b> χρόνια \u00b7 <b>{m}</b> μήνες \u00b7 <b>{d}</b> μέρες',upLabel:'Επόμενα jouriversaires',daysWord:'μέρες',inDays:'σε {n} μέρες',
+ uJours:'Μέρες',uSemaines:'Εβδομάδες',uMois:'Μήνες',uAnnees:'Χρόνια',uHeures:'Ώρες',uMinutes:'Λεπτά',uSecondes:'Δευτερόλεπτα',
+ keep:'Κρατήστε τις ημερομηνίες σας',keepDesc:'Δημιουργήστε δωρεάν λογαριασμό για να <b>αποθηκεύετε τις ημερομηνίες σας και της οικογένειάς σας</b> και να τις βρίσκετε σε κάθε σύνδεση, σε όλες τις συσκευές.',createAcc:'Δημιουργία δωρεάν λογαριασμού',
+ backCalc:'‹ Πίσω στον υπολογιστή',tabLogin:'Σύνδεση',tabSignup:'Εγγραφή',fEmail:'Email',fPass:'Κωδικός',btnLogin:'Σύνδεση',btnSignup:'Δημιουργία λογαριασμού',forgot:'Ξεχάσατε τον κωδικό;',
+ consent:'Δημιουργώντας λογαριασμό, αποδέχεστε την αποθήκευση του email και των ημερομηνιών σας για την παροχή της υπηρεσίας (βλ. {link}).',consentLink:'απόρρητο',
+ connected:'Συνδεδεμένος:',logout:'Αποσύνδεση',addDate:'Προσθήκη ημερομηνίας',dLabel:'Ετικέτα',dLabelPh:'Γάμος, γέννηση του Τριστάν…',dType:'Τύπος',
+ tNaissance:'🎂 Γέννηση',tMariage:'💍 Γάμος',tRencontre:'❤️ Γνωριμία',tAutre:'✦ Άλλο',save:'＋ Αποθήκευση',myDates:'Οι ημερομηνίες μου',noDates:'Δεν υπάρχουν αποθηκευμένες ημερομηνίες ακόμη.',
+ myData:'Τα δεδομένα μου',rgpdDesc:'Μπορείτε ανά πάσα στιγμή να εξαγάγετε τα δεδομένα σας ή να διαγράψετε οριστικά τον λογαριασμό και όλες τις ημερομηνίες.',exportData:'⬆ Εξαγωγή (CSV)',importBtn:'⬇ Εισαγωγή (CSV)',importedMsg:'Εισήχθησαν {n} ημερομηνίες.',csvErr:'Μη αναγνώσιμο αρχείο CSV.',deleteAcc:'Διαγραφή λογαριασμού',
+ back:'‹ Πίσω',footTag:'Jouriversaire — γιορτάστε τις χιλιάδες μέρες σας.',footLegal:'Νομικές πληροφορίες & απόρρητο',
+ mPreview:'Οι λογαριασμοί θα λειτουργήσουν μόλις δημοσιευθεί ο ιστότοπος με το έργο σας στο Supabase. Ο υπολογιστής λειτουργεί ήδη.',mFields:'Απαιτούνται email και κωδικός.',mInvalid:'Λανθασμένα στοιχεία.',
+ mCreated:'Ο λογαριασμός δημιουργήθηκε! Ελέγξτε το email σας και πατήστε τον σύνδεσμο επιβεβαίωσης.',mReset:'Στάλθηκε email επαναφοράς.',mFieldsReq:'Απαιτούνται ετικέτα και ημερομηνία.',mEmailFirst:'Πληκτρολογήστε πρώτα το email σας.',
+ cDelDate:'Διαγραφή του «{l}»;',cDelAcc:'ΟΡΙΣΤΙΚΗ διαγραφή λογαριασμού και όλων των ημερομηνιών; Μη αναστρέψιμη ενέργεια.',accDeleted:'Ο λογαριασμός και τα δεδομένα διαγράφηκαν.',newPass:'Επιλέξτε νέο κωδικό:',passUpd:'Ο κωδικός ενημερώθηκε.',
+ legal:'<h4>Νομικές πληροφορίες & απόρρητο</h4><p><b>Εκδότης:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Φιλοξενία:</b> GitHub Pages· λογαριασμοί και βάση δεδομένων στο Supabase (περιοχή ΕΕ).</p><h4>Δεδομένα</h4><p>Χωρίς λογαριασμό: τίποτα δεν αποθηκεύεται. Με λογαριασμό: το email και οι ημερομηνίες σας, αποκλειστικά για την υπηρεσία αποθήκευσης.</p><h4>Τα δικαιώματά σας</h4><p>Πρόσβαση, διόρθωση, φορητότητα (εξαγωγή) και διαγραφή από «Τα δεδομένα μου». Νομική βάση: συγκατάθεση και εκτέλεση της υπηρεσίας.</p><p>«Jouriversaire» — ιδέα και όρος του Georges Viana. \u00a9 2026.</p>',
+ exTitle:'Το μέτρο των ημερών σας',exSub:'Τι πραγματικά αντιπροσωπεύουν αυτές οι {n} μέρες',exHeart:'χτύποι της καρδιάς',exBreath:'αναπνοές',exSun:'γύρω από τον Ήλιο',exMoon:'πανσέληνοι',exSleep:'στον ύπνο',exSleepY:'σχεδόν {y} χρόνια',exSummer:'καλοκαίρια',
+ idTitle:'Χρονική ταυτότητα',idSub:'Τι λέει αυτή η ημερομηνία',kDow:'Ημέρα της εβδομάδας',kSeason:'Εποχή',kZodiac:'Ζώδιο',kChinese:'Κινεζικό ζώδιο',kMoon:'Το φεγγάρι εκείνη τη μέρα',kDoy:'Ημέρα του έτους',
+ seasons:['Άνοιξη','Καλοκαίρι','Φθινόπωρο','Χειμώνας'],
+ zodiac:['Κριός','Ταύρος','Δίδυμοι','Καρκίνος','Λέων','Παρθένος','Ζυγός','Σκορπιός','Τοξότης','Αιγόκερως','Υδροχόος','Ιχθύες'],
+ cnz:['Αρουραίος','Βόδι','Τίγρη','Κουνέλι','Δράκος','Φίδι','Άλογο','Κατσίκα','Μαϊμού','Πετεινός','Σκύλος','Χοίρος'],
+ moonp:['Νέα Σελήνη','Αύξων μηνίσκος','Πρώτο τέταρτο','Αύξουσα αμφίκυρτος','Πανσέληνος','Φθίνουσα αμφίκυρτος','Τελευταίο τέταρτο','Φθίνων μηνίσκος'],
+ spTitle:'Η έκπληξη του επόμενου jouriversaire',spTxt:'Σημείο εκκίνησης: {s0}. Επόμενο ορόσημο: {s1}, {dow}! Ένα jouriversaire δεν πέφτει ποτέ εκεί που το περιμένεις.',
+ jkTitle:'Το αστείο της ημέρας',jkMore:'↻ άλλο ένα',
+ jokes:['Γιατί τα jouriversaires δεν αργούν ποτέ; Γιατί μετράνε κάθε μέρα!','Τι είπε ένα ημερολόγιο σε ένα άλλο; «Βασίζομαι πάνω σου κάθε μέρα.»','Το να γιορτάζεις 10.000 μέρες κάνει καλό στην υγεία: όποιος μετρά τις περισσότερες μέρες ζει περισσότερο!']},
+sv:{lang:'Svenska',navAccount:'Mitt konto ›',heroT:'Tänk om du räknade dina dagar,|inte bara dina år?',
+ lede1:'Ett <b>jouriversaire</b> är dagen då din dagräknare passerar en jämn milstolpe: 10 000 dagar, 20 000 dagar, 25 000 dagar…',
+ lede2:'Dessa tusentals dagar är <b>mer sällsynta</b> och framför allt <b>oförutsägbara</b>: till skillnad från din födelsedag, alltid i samma årstid, kan ett jouriversaire infalla mitt i sommaren och nästa mitt i vintern. Vart och ett är en riktig överraskning — ett tillfälle att fira där du minst anar det.',
+ copy:'"Jouriversaire" — koncept och begrepp skapade av Georges Viana. \u00a9 2026 Georges Viana. Alla rättigheter förbehållna.',
+ calc:'Beräkna dina jouriversaires',fDate:'Datum',fTime:'Tid (valfritt)',
+ lifeTpl:'<b>{y}</b> år \u00b7 <b>{m}</b> mån \u00b7 <b>{d}</b> dagar',upLabel:'Kommande jouriversaires',daysWord:'dagar',inDays:'om {n} dagar',
+ uJours:'Dagar',uSemaines:'Veckor',uMois:'Månader',uAnnees:'År',uHeures:'Timmar',uMinutes:'Minuter',uSecondes:'Sekunder',
+ keep:'Spara dina datum',keepDesc:'Skapa ett gratis konto för att <b>spara dina och familjens datum</b> och hitta dem vid varje inloggning, på alla enheter.',createAcc:'Skapa ett gratis konto',
+ backCalc:'‹ Tillbaka till kalkylatorn',tabLogin:'Logga in',tabSignup:'Registrera',fEmail:'E-post',fPass:'Lösenord',btnLogin:'Logga in',btnSignup:'Skapa mitt konto',forgot:'Glömt lösenordet?',
+ consent:'Genom att skapa ett konto godkänner du att din e-post och dina datum sparas för att tillhandahålla tjänsten (se {link}).',consentLink:'integritet',
+ connected:'Inloggad:',logout:'Logga ut',addDate:'Lägg till datum',dLabel:'Etikett',dLabelPh:'Bröllop, Tristans födelse…',dType:'Typ',
+ tNaissance:'🎂 Födelse',tMariage:'💍 Bröllop',tRencontre:'❤️ Möte',tAutre:'✦ Annat',save:'＋ Spara',myDates:'Mina datum',noDates:'Inga sparade datum ännu.',
+ myData:'Mina uppgifter',rgpdDesc:'Du kan när som helst exportera dina uppgifter eller permanent radera ditt konto och alla dina datum.',exportData:'⬆ Exportera (CSV)',importBtn:'⬇ Importera (CSV)',importedMsg:'{n} datum importerade.',csvErr:'Oläslig CSV-fil.',deleteAcc:'Radera mitt konto',
+ back:'‹ Tillbaka',footTag:'Jouriversaire — fira dina tusentals dagar.',footLegal:'Juridisk information & integritet',
+ mPreview:'Konton fungerar när sajten publicerats med ditt Supabase-projekt. Kalkylatorn fungerar redan nu.',mFields:'E-post och lösenord krävs.',mInvalid:'Felaktiga inloggningsuppgifter.',
+ mCreated:'Konto skapat! Kolla din inkorg och klicka på bekräftelselänken.',mReset:'Återställningsmejl skickat.',mFieldsReq:'Etikett och datum krävs.',mEmailFirst:'Ange din e-post först.',
+ cDelDate:'Radera "{l}"?',cDelAcc:'Radera ditt konto och alla datum PERMANENT? Kan inte ångras.',accDeleted:'Ditt konto och dina uppgifter har raderats.',newPass:'Välj ett nytt lösenord:',passUpd:'Lösenordet uppdaterat.',
+ legal:'<h4>Juridisk information & integritet</h4><p><b>Utgivare:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Värd:</b> GitHub Pages; konton och databas hos Supabase (EU-region).</p><h4>Uppgifter</h4><p>Utan konto: inget sparas. Med konto: din e-post och dina datum, enbart för spartjänsten.</p><h4>Dina rättigheter</h4><p>Tillgång, rättelse, portabilitet (export) och radering under "Mina uppgifter". Rättslig grund: samtycke och fullgörande av tjänsten.</p><p>"Jouriversaire" — koncept och begrepp av Georges Viana. \u00a9 2026.</p>',
+ exTitle:'Måttet på dina dagar',exSub:'Vad dessa {n} dagar verkligen motsvarar',exHeart:'hjärtslag',exBreath:'andetag',exSun:'runt solen',exMoon:'fullmånar',exSleep:'i sömn',exSleepY:'nästan {y} år',exSummer:'somrar',
+ idTitle:'Tidens ID-kort',idSub:'Vad detta datum berättar',kDow:'Veckodag',kSeason:'Årstid',kZodiac:'Stjärntecken',kChinese:'Kinesisk zodiak',kMoon:'Månen den dagen',kDoy:'Dag på året',
+ seasons:['Vår','Sommar','Höst','Vinter'],
+ zodiac:['Väduren','Oxen','Tvillingarna','Kräftan','Lejonet','Jungfrun','Vågen','Skorpionen','Skytten','Stenbocken','Vattumannen','Fiskarna'],
+ cnz:['Råttan','Oxen','Tigern','Kaninen','Draken','Ormen','Hästen','Geten','Apan','Tuppen','Hunden','Grisen'],
+ moonp:['Nymåne','Tilltagande skära','Första kvarteret','Tilltagande måne','Fullmåne','Avtagande måne','Sista kvarteret','Avtagande skära'],
+ spTitle:'Nästa jouriversaires överraskning',spTxt:'Startdatum: {s0}. Nästa milstolpe: {s1}, en {dow}! Ett jouriversaire infaller aldrig där man väntar sig.',
+ jkTitle:'Dagens skämt',jkMore:'↻ ett till',
+ jokes:['Varför är jouriversaires aldrig försenade? För att de räknar varje dag!','Vad sa en kalender till en annan? "Man kan räkna med dig varje dag."','Att fira 10 000 dagar är bra för hälsan: den som räknar flest dagar lever längst!']},
+nl:{lang:'Nederlands',navAccount:'Mijn account ›',heroT:'Wat als je je dagen telde,|niet alleen je jaren?',
+ lede1:'Een <b>jouriversaire</b> is de dag waarop je dagenteller een ronde mijlpaal passeert: 10.000 dagen, 20.000 dagen, 25.000 dagen…',
+ lede2:'Deze duizenden dagen zijn <b>zeldzamer</b> en vooral <b>onvoorspelbaar</b>: anders dan je verjaardag, altijd in hetzelfde seizoen, kan een jouriversaire midden in de zomer vallen en de volgende midden in de winter. Elk is een echte verrassing — een gelegenheid om te vieren waar je het niet verwacht.',
+ copy:'"Jouriversaire" — concept en term bedacht door Georges Viana. \u00a9 2026 Georges Viana. Alle rechten voorbehouden.',
+ calc:'Bereken je jouriversaires',fDate:'Datum',fTime:'Tijd (optioneel)',
+ lifeTpl:'<b>{y}</b> jaar \u00b7 <b>{m}</b> maanden \u00b7 <b>{d}</b> dagen',upLabel:'Komende jouriversaires',daysWord:'dagen',inDays:'over {n} dagen',
+ uJours:'Dagen',uSemaines:'Weken',uMois:'Maanden',uAnnees:'Jaren',uHeures:'Uren',uMinutes:'Minuten',uSecondes:'Seconden',
+ keep:'Bewaar je data',keepDesc:'Maak een gratis account om <b>je data en die van je familie op te slaan</b> en ze bij elke aanmelding terug te vinden, op al je apparaten.',createAcc:'Gratis account aanmaken',
+ backCalc:'‹ Terug naar de calculator',tabLogin:'Inloggen',tabSignup:'Registreren',fEmail:'E-mail',fPass:'Wachtwoord',btnLogin:'Inloggen',btnSignup:'Account aanmaken',forgot:'Wachtwoord vergeten?',
+ consent:'Door een account aan te maken ga je akkoord met het bewaren van je e-mail en data om de dienst te leveren (zie {link}).',consentLink:'privacy',
+ connected:'Ingelogd:',logout:'Uitloggen',addDate:'Datum toevoegen',dLabel:'Label',dLabelPh:'Bruiloft, geboorte van Tristan…',dType:'Type',
+ tNaissance:'🎂 Geboorte',tMariage:'💍 Bruiloft',tRencontre:'❤️ Ontmoeting',tAutre:'✦ Anders',save:'＋ Opslaan',myDates:'Mijn data',noDates:'Nog geen opgeslagen data.',
+ myData:'Mijn gegevens',rgpdDesc:'Je kunt op elk moment je gegevens exporteren of je account en alle data definitief verwijderen.',exportData:'⬆ Exporteren (CSV)',importBtn:'⬇ Importeren (CSV)',importedMsg:'{n} datum(s) geïmporteerd.',csvErr:'Onleesbaar CSV-bestand.',deleteAcc:'Account verwijderen',
+ back:'‹ Terug',footTag:'Jouriversaire — vier je duizenden dagen.',footLegal:'Juridische informatie & privacy',
+ mPreview:'Accounts werken zodra de site is gepubliceerd met je Supabase-project. De calculator werkt nu al.',mFields:'E-mail en wachtwoord vereist.',mInvalid:'Onjuiste inloggegevens.',
+ mCreated:'Account aangemaakt! Controleer je inbox en klik op de bevestigingslink.',mReset:'Herstelmail verzonden.',mFieldsReq:'Label en datum vereist.',mEmailFirst:'Voer eerst je e-mail in.',
+ cDelDate:'"{l}" verwijderen?',cDelAcc:'Je account en alle data DEFINITIEF verwijderen? Onomkeerbaar.',accDeleted:'Je account en gegevens zijn verwijderd.',newPass:'Kies een nieuw wachtwoord:',passUpd:'Wachtwoord bijgewerkt.',
+ legal:'<h4>Juridische informatie & privacy</h4><p><b>Uitgever:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Hosting:</b> GitHub Pages; accounts en database bij Supabase (EU-regio).</p><h4>Gegevens</h4><p>Zonder account: niets wordt opgeslagen. Met account: je e-mail en data, uitsluitend voor de opslagdienst.</p><h4>Je rechten</h4><p>Inzage, correctie, overdraagbaarheid (export) en verwijdering via "Mijn gegevens". Rechtsgrond: toestemming en uitvoering van de dienst.</p><p>"Jouriversaire" — concept en term van Georges Viana. \u00a9 2026.</p>',
+ exTitle:'De maat van je dagen',exSub:'Wat deze {n} dagen echt betekenen',exHeart:'hartslagen',exBreath:'ademhalingen',exSun:'rond de zon afgelegd',exMoon:'volle manen gezien',exSleep:'slapend doorgebracht',exSleepY:'bijna {y} jaar',exSummer:'zomers beleefd',
+ idTitle:'Tijd-identiteitskaart',idSub:'Wat deze datum vertelt',kDow:'Dag van de week',kSeason:'Seizoen',kZodiac:'Sterrenbeeld',kChinese:'Chinese dierenriem',kMoon:'De maan die dag',kDoy:'Dag van het jaar',
+ seasons:['Lente','Zomer','Herfst','Winter'],
+ zodiac:['Ram','Stier','Tweelingen','Kreeft','Leeuw','Maagd','Weegschaal','Schorpioen','Boogschutter','Steenbok','Waterman','Vissen'],
+ cnz:['Rat','Os','Tijger','Konijn','Draak','Slang','Paard','Geit','Aap','Haan','Hond','Varken'],
+ moonp:['Nieuwe maan','Wassende sikkel','Eerste kwartier','Wassende maan','Volle maan','Afnemende maan','Laatste kwartier','Afnemende sikkel'],
+ spTitle:'De verrassing van de volgende jouriversaire',spTxt:'Startdatum: {s0}. Volgende mijlpaal: {s1}, op een {dow}! Een jouriversaire valt nooit waar je hem verwacht.',
+ jkTitle:'Grap van de dag',jkMore:'↻ nog een',
+ jokes:['Waarom zijn jouriversaires nooit te laat? Omdat ze elke dag tellen!','Wat zei de ene kalender tegen de andere? "Op jou kun je elke dag rekenen."','10.000 dagen vieren is gezond: wie de meeste dagen telt, leeft het langst!']},
+no:{lang:'Norsk',navAccount:'Min konto ›',heroT:'Hva om du telte dagene dine,|ikke bare årene?',
+ lede1:'Et <b>jouriversaire</b> er dagen da dagtelleren din passerer en rund milepæl: 10 000 dager, 20 000 dager, 25 000 dager…',
+ lede2:'Disse tusenvis av dagene er <b>sjeldnere</b> og fremfor alt <b>uforutsigbare</b>: i motsetning til bursdagen din, alltid i samme årstid, kan et jouriversaire falle midt på sommeren og det neste midt på vinteren. Hvert eneste er en ekte overraskelse — en anledning til å feire der du minst venter det.',
+ copy:'"Jouriversaire" — konsept og begrep skapt av Georges Viana. \u00a9 2026 Georges Viana. Alle rettigheter forbeholdt.',
+ calc:'Beregn dine jouriversaires',fDate:'Dato',fTime:'Klokkeslett (valgfritt)',
+ lifeTpl:'<b>{y}</b> år \u00b7 <b>{m}</b> mnd \u00b7 <b>{d}</b> dager',upLabel:'Kommende jouriversaires',daysWord:'dager',inDays:'om {n} dager',
+ uJours:'Dager',uSemaines:'Uker',uMois:'Måneder',uAnnees:'År',uHeures:'Timer',uMinutes:'Minutter',uSecondes:'Sekunder',
+ keep:'Ta vare på datoene dine',keepDesc:'Opprett en gratis konto for å <b>lagre dine og familiens datoer</b> og finne dem igjen ved hver innlogging, på alle enheter.',createAcc:'Opprett en gratis konto',
+ backCalc:'‹ Tilbake til kalkulatoren',tabLogin:'Logg inn',tabSignup:'Registrer',fEmail:'E-post',fPass:'Passord',btnLogin:'Logg inn',btnSignup:'Opprett kontoen min',forgot:'Glemt passordet?',
+ consent:'Ved å opprette en konto godtar du at e-posten og datoene dine lagres for å levere tjenesten (se {link}).',consentLink:'personvern',
+ connected:'Innlogget:',logout:'Logg ut',addDate:'Legg til dato',dLabel:'Etikett',dLabelPh:'Bryllup, Tristans fødsel…',dType:'Type',
+ tNaissance:'🎂 Fødsel',tMariage:'💍 Bryllup',tRencontre:'❤️ Møte',tAutre:'✦ Annet',save:'＋ Lagre',myDates:'Mine datoer',noDates:'Ingen lagrede datoer ennå.',
+ myData:'Mine data',rgpdDesc:'Du kan når som helst eksportere dataene dine eller slette kontoen og alle datoene permanent.',exportData:'⬆ Eksporter (CSV)',importBtn:'⬇ Importer (CSV)',importedMsg:'{n} dato(er) importert.',csvErr:'Uleselig CSV-fil.',deleteAcc:'Slett kontoen min',
+ back:'‹ Tilbake',footTag:'Jouriversaire — feir dine tusenvis av dager.',footLegal:'Juridisk informasjon og personvern',
+ mPreview:'Kontoer fungerer når nettstedet er publisert med Supabase-prosjektet ditt. Kalkulatoren fungerer allerede.',mFields:'E-post og passord kreves.',mInvalid:'Feil påloggingsinformasjon.',
+ mCreated:'Konto opprettet! Sjekk innboksen og klikk på bekreftelseslenken.',mReset:'Tilbakestillings-e-post sendt.',mFieldsReq:'Etikett og dato kreves.',mEmailFirst:'Skriv inn e-posten din først.',
+ cDelDate:'Slette "{l}"?',cDelAcc:'Slette kontoen og alle datoene PERMANENT? Kan ikke angres.',accDeleted:'Kontoen og dataene dine er slettet.',newPass:'Velg et nytt passord:',passUpd:'Passordet er oppdatert.',
+ legal:'<h4>Juridisk informasjon og personvern</h4><p><b>Utgiver:</b> SAS NEW-D — Georges Viana, Saint-Malo. contact@jouriversaire.com.</p><p><b>Drift:</b> GitHub Pages; kontoer og database hos Supabase (EU-region).</p><h4>Data</h4><p>Uten konto: ingenting lagres. Med konto: e-posten og datoene dine, kun for lagringstjenesten.</p><h4>Dine rettigheter</h4><p>Innsyn, retting, portabilitet (eksport) og sletting under "Mine data". Rettslig grunnlag: samtykke og oppfyllelse av tjenesten.</p><p>"Jouriversaire" — konsept og begrep av Georges Viana. \u00a9 2026.</p>',
+ exTitle:'Målet på dagene dine',exSub:'Hva disse {n} dagene virkelig tilsvarer',exHeart:'hjerteslag',exBreath:'åndedrag',exSun:'rundt solen',exMoon:'fullmåner',exSleep:'i søvn',exSleepY:'nesten {y} år',exSummer:'somre',
+ idTitle:'Tidens ID-kort',idSub:'Hva denne datoen forteller',kDow:'Ukedag',kSeason:'Årstid',kZodiac:'Stjernetegn',kChinese:'Kinesisk dyrekrets',kMoon:'Månen den dagen',kDoy:'Dag i året',
+ seasons:['Vår','Sommer','Høst','Vinter'],
+ zodiac:['Væren','Tyren','Tvillingene','Krepsen','Løven','Jomfruen','Vekten','Skorpionen','Skytten','Steinbukken','Vannmannen','Fiskene'],
+ cnz:['Rotten','Oksen','Tigeren','Kaninen','Dragen','Slangen','Hesten','Geiten','Apen','Hanen','Hunden','Grisen'],
+ moonp:['Nymåne','Voksende sigd','Første kvarter','Voksende måne','Fullmåne','Minkende måne','Siste kvarter','Minkende sigd'],
+ spTitle:'Overraskelsen ved neste jouriversaire',spTxt:'Startdato: {s0}. Neste milepæl: {s1}, en {dow}! Et jouriversaire faller aldri der du venter det.',
+ jkTitle:'Dagens vits',jkMore:'↻ en til',
+ jokes:['Hvorfor er jouriversaires aldri forsinket? Fordi de teller hver dag!','Hva sa den ene kalenderen til den andre? "Man kan regne med deg hver dag."','Å feire 10 000 dager er sunt: den som teller flest dager, lever lengst!']}
+};
+Object.keys(EXTRAS).forEach(function(k){if(!I18N[k])I18N[k]={};Object.assign(I18N[k],EXTRAS[k]);});
+
+const LOCALES={fr:'fr-FR',en:'en-GB',es:'es-ES',pt:'pt-PT',pl:'pl-PL',de:'de-DE',it:'it-IT',zh:'zh-CN',ja:'ja-JP',ko:'ko-KR',ar:'ar',he:'he-IL',ru:'ru-RU',uk:'uk-UA',el:'el-GR',sv:'sv-SE',nl:'nl-NL',no:'nb-NO'};
+const RTL={ar:1,he:1};
 
 const LOGO='<svg class="logo" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">'
 +'<defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#FBB040"/><stop offset="0.55" stop-color="#F2674A"/><stop offset="1" stop-color="#F0506E"/></linearGradient></defs>'
@@ -486,7 +835,9 @@ function applyLang(){
   $('hero-title').innerHTML='<span>'+ht[0]+'</span><br><em>'+(ht[1]||'')+'</em>';
   $('lede1').innerHTML=t('lede1');$('lede2').innerHTML=t('lede2');$('copyline').textContent=t('copy');
   $('lbl-calc').textContent=t('calc');$('lbl-date').textContent=t('fDate');$('lbl-time').textContent=t('fTime');
-  $('lbl-anec').textContent=t('anecLabel');$('lbl-up').textContent=t('upLabel');
+  $('lbl-up').textContent=t('upLabel');
+  $('ex-title').textContent=t('exTitle');$('id-title').textContent=t('idTitle');$('id-sub').textContent=t('idSub');
+  $('sp-title').textContent=t('spTitle');$('jk-title').textContent=t('jkTitle');$('jk-refresh').textContent=t('jkMore');
   $('lbl-keep').textContent=t('keep');$('txt-keep').innerHTML=t('keepDesc');$('cta-account').textContent=t('createAcc');
   $('nav-account').textContent=t('navAccount');
   $('back-home').textContent=t('backCalc');$('back-home2').textContent=t('back');
@@ -521,8 +872,8 @@ function renderCalc(){
   calcDate=dt;res.style.display='block';const now=new Date(),c=counts(dt,now);
   $('r-age').innerHTML=t('lifeTpl').replace('{y}',c.age.y).replace('{m}',c.age.m).replace('{d}',c.age.d);
   /* Actuel */
-  const cells=[['jours','uJours',1],['semaines','uSemaines',0],['mois','uMois',0],['annees','uAnnees',0],['heures','uHeures',0],['minutes','uMinutes',0],['secondes','uSecondes',0]];
-  $('r-grid').innerHTML=cells.map(x=>'<div class="stat'+(x[2]?' lead':'')+'"><div class="stat-l">'+t(x[1])+'</div><div class="stat-v" id="cv-'+x[0]+'">'+fmt(c[x[0]])+'</div></div>').join('');
+  const cells=[['jours','uJours','lead c-coral','\u2600\ufe0f'],['semaines','uSemaines','c-teal','\ud83d\udd04'],['mois','uMois','c-gold','\ud83d\udcc5'],['annees','uAnnees','c-cream','\ud83d\udd50'],['heures','uHeures','c-teal','\u23f0'],['minutes','uMinutes','c-mint','\u23f1\ufe0f'],['secondes','uSecondes','c-pink','\ud83c\udf89']];
+  $('r-grid').innerHTML=cells.map(x=>'<div class="stat '+x[2]+'"><div class="stat-l">'+t(x[1])+'</div><div class="stat-v" id="cv-'+x[0]+'">'+fmt(c[x[0]])+'</div><div class="ic">'+x[3]+'</div></div>').join('');
   /* Prochains jouriversaires (encadré) */
   const seen={},rows=[];
   [1000,5000,10000].forEach(step=>{
@@ -534,25 +885,77 @@ function renderCalc(){
   $('r-up').innerHTML=rows.join('');
   if(calcTick)clearInterval(calcTick);
   calcTick=setInterval(()=>{const cc=counts(calcDate,new Date());['secondes','minutes','heures'].forEach(u=>{const e=$('cv-'+u);if(e)e.textContent=fmt(cc[u]);});},1000);
-  loadAnecdote(dt);
+  renderExtras(dt,c);
 }
-/* Anecdote : filtre des événements sombres (guerre, mort, catastrophe…) */
-const GRIM=/guerr|meurtr|\bmort|tué|massacr|assassin|attentat|exécut|bombard|séisme|catastroph|naufrag|épidémi|génocid|pandémi|\bwar\b|murder|death|died|dies|kill|massacre|execut|\bbomb|earthquake|disaster|crash|epidemic|genocide|battle|invasion|terror|guerra|muert|asesin|masacr|terremoto|krieg|\bmord|\btod\b|getötet|schlacht|hinricht|erdbeben|wojn|śmier|zabij|zamach|bitw|morte|ucciso|strage|殺|战争|戦争|地震|虐殺|전쟁|사망|학살|قتل|حرب|وفاة|مذبح|زلزال/i;
-function loadAnecdote(dt){
-  const el=$('anec-txt');el.textContent=t('anecLoad');
-  const mm=('0'+(dt.getMonth()+1)).slice(-2),dd=('0'+dt.getDate()).slice(-2);
-  fetch('https://'+L+'.wikipedia.org/api/rest_v1/feed/onthisday/events/'+mm+'/'+dd)
-    .then(r=>r.json()).then(data=>{
-      let ev=(data&&data.events)||[];
-      const ok=ev.filter(x=>!GRIM.test(x.text||''));
-      if(ok.length)ev=ok;
-      if(!ev.length){el.textContent=t('anecNone');return;}
-      const p=ev[Math.floor(Math.random()*Math.min(ev.length,15))];
-      el.textContent=t('anecTpl').replace('{year}',p.year).replace('{text}',p.text);})
-    .catch(()=>{el.textContent=t('anecErr');});
+/* ===== Blocs enrichis : mesures, carte d'identité, surprise, blague ===== */
+function cnum(n){try{return new Intl.NumberFormat(loc(),{notation:'compact',maximumSignificantDigits:2}).format(n);}catch(e){return fmt(n);}}
+function seasonIdx(d){var m=d.getMonth()+1,dd=d.getDate();
+  if((m===3&&dd>=20)||m===4||m===5||(m===6&&dd<21))return 0;
+  if((m===6&&dd>=21)||m===7||m===8||(m===9&&dd<22))return 1;
+  if((m===9&&dd>=22)||m===10||m===11||(m===12&&dd<21))return 2;
+  return 3;}
+function zodiacIdx(d){var m=d.getMonth()+1,dd=d.getDate();
+  /* index 0=Bélier … 11=Poissons */
+  if(m===1)return dd<20?9:10; if(m===2)return dd<19?10:11; if(m===3)return dd<21?11:0;
+  if(m===4)return dd<20?0:1; if(m===5)return dd<21?1:2; if(m===6)return dd<21?2:3;
+  if(m===7)return dd<23?3:4; if(m===8)return dd<23?4:5; if(m===9)return dd<23?5:6;
+  if(m===10)return dd<23?6:7; if(m===11)return dd<22?7:8; return dd<22?8:9;}
+function cnzIdx(d){var y=d.getFullYear(),m=d.getMonth()+1,dd=d.getDate();
+  if(m<2||(m===2&&dd<4))y--; /* approximation du nouvel an chinois (~4 février) */
+  return ((y-4)%12+12)%12;}
+function moonIdx(d){var syn=29.53058867,ref=Date.UTC(2000,0,6,18,14);
+  var days=(d.getTime()-ref)/86400000,ph=((days%syn)+syn)%syn;
+  return Math.floor(ph/syn*8+0.5)%8;}
+function dayOfYear(d){var y=d.getFullYear();return Math.round((Date.UTC(y,d.getMonth(),d.getDate())-Date.UTC(y,0,0))/86400000);}
+function isLeap(y){return (y%4===0&&y%100!==0)||y%400===0;}
+var S_EMO=['\ud83c\udf38','\u2600\ufe0f','\ud83c\udf42','\u2744\ufe0f'],
+    Z_EMO=['\u2648','\u2649','\u264a','\u264b','\u264c','\u264d','\u264e','\u264f','\u2650','\u2651','\u2652','\u2653'],
+    C_EMO=['\ud83d\udc2d','\ud83d\udc2e','\ud83d\udc2f','\ud83d\udc30','\ud83d\udc32','\ud83d\udc0d','\ud83d\udc34','\ud83d\udc10','\ud83d\udc35','\ud83d\udc14','\ud83d\udc36','\ud83d\udc37'],
+    M_EMO=['\ud83c\udf11','\ud83c\udf12','\ud83c\udf13','\ud83c\udf14','\ud83c\udf15','\ud83c\udf16','\ud83c\udf17','\ud83c\udf18'];
+var jkN=0;
+function renderJoke(){var js=t('jokes')||[];if(!js.length)return;var base=dayOfYear(new Date());$('jk-txt').textContent=js[((base+jkN)%js.length+js.length)%js.length];}
+function lowSeason(sn){return L==='de'?sn:sn.toLocaleLowerCase(loc());}
+function renderExtras(dt,c){
+  /* Mesures (masquées pour une date future) */
+  var mc=$('x-measures');
+  if(c.jours<=0){mc.style.display='none';}
+  else{mc.style.display='block';
+    $('ex-sub').textContent=t('exSub').replace('{n}',fmt(c.jours));
+    var rows=[
+      ['\u2764\ufe0f','\u2248 '+cnum(c.jours*100800),t('exHeart')],
+      ['\ud83e\udec1','\u2248 '+cnum(c.jours*23040),t('exBreath')],
+      ['\ud83c\udf0d','\u2248 '+cnum(c.jours*2575000)+' km',t('exSun')],
+      ['\ud83c\udf15','\u2248 '+fmt(Math.floor(c.jours/29.5306)),t('exMoon')],
+      ['\ud83d\ude34','\u2248 '+fmt(Math.round(c.jours/3))+' '+t('daysWord'),t('exSleep')+' ('+t('exSleepY').replace('{y}',Math.max(1,Math.round(c.jours/1095)))+')'],
+      ['\u2600\ufe0f',fmt(Math.max(0,c.annees)),t('exSummer')]
+    ];
+    $('ex-rows').innerHTML=rows.map(function(r){return '<div class="measure"><span class="e">'+r[0]+'</span><div><span class="mbig">'+r[1]+'</span> <span class="mtxt">'+esc(r[2])+'</span></div></div>';}).join('');
+  }
+  /* Carte d'identité temporelle */
+  var dow=fmtDate(dt,{weekday:'long'});dow=dow.charAt(0).toLocaleUpperCase(loc())+dow.slice(1);
+  var si=seasonIdx(dt),zi=zodiacIdx(dt),ci=cnzIdx(dt),mi=moonIdx(dt);
+  var doy=dayOfYear(dt),tot=isLeap(dt.getFullYear())?366:365;
+  var cellsId=[
+    [t('kDow'),dow],
+    [t('kSeason'),t('seasons')[si]+' '+S_EMO[si]],
+    [t('kZodiac'),t('zodiac')[zi]+' '+Z_EMO[zi]],
+    [t('kChinese'),t('cnz')[ci]+' '+C_EMO[ci]],
+    [t('kMoon'),t('moonp')[mi]+' '+M_EMO[mi]],
+    [t('kDoy'),fmt(doy)+' / '+tot]
+  ];
+  $('id-grid').innerHTML=cellsId.map(function(x){return '<div class="idcell"><div class="k">'+esc(x[0])+'</div><div class="val">'+esc(x[1])+'</div></div>';}).join('');
+  /* Surprise du prochain palier (multiple de 1000) */
+  var now=new Date(),tgt=nextMult(c.jours,1000),date=new Date(dt.getTime()+tgt*MS_DAY);
+  $('sp-big').textContent=fmt(tgt)+' '+t('daysWord')+' \u2014 '+fmtDate(date,{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+  var s1=seasonIdx(date),dw=fmtDate(date,{weekday:'long'});
+  $('sp-txt').textContent=t('spTxt')
+    .replace('{s0}',lowSeason(t('seasons')[si])+' '+S_EMO[si])
+    .replace('{s1}',lowSeason(t('seasons')[s1])+' '+S_EMO[s1])
+    .replace('{dow}',dw);
+  renderJoke();
 }
 $('c-date').addEventListener('change',renderCalc);$('c-date').addEventListener('input',renderCalc);$('c-time').addEventListener('change',renderCalc);
-$('anec-refresh').addEventListener('click',()=>{if(calcDate)loadAnecdote(calcDate);});
+$('jk-refresh').addEventListener('click',()=>{jkN++;renderJoke();});
 
 /* nav + historique navigateur */
 function showView(v){['home','account','legal'].forEach(x=>$('view-'+x).classList.add('hidden'));$('view-'+v).classList.remove('hidden');window.scrollTo(0,0);}
@@ -674,7 +1077,7 @@ sel.addEventListener('change',()=>{L=sel.value;lset('jv_lang',L);applyLang();});
 
 /* init */
 $('logo-slot').innerHTML=LOGO;
-const saved=lget('jv_lang'),nav=(navigator.language||'fr').slice(0,2).toLowerCase();
+const saved=lget('jv_lang');let nav=(navigator.language||'fr').slice(0,2).toLowerCase();if(nav==='nb'||nav==='nn')nav='no';if(nav==='iw')nav='he';
 L=(saved&&I18N[saved])?saved:(I18N[nav]?nav:'fr');
 sel.value=L;
 applyLang();
