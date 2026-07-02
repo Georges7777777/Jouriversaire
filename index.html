@@ -30,14 +30,14 @@
   .brandtxt h1{font-family:var(--serif);font-size:23px;font-weight:700;color:var(--ink);line-height:1;}
   .brandtxt h1 em{font-style:normal;color:var(--accent);}
   .langsel{background:var(--card);border:1px solid var(--line);border-radius:9px;padding:8px 10px;font-family:var(--mono);font-size:12px;color:var(--ink);color-scheme:light;outline:none;cursor:pointer;}
-  .nav{font-size:11px;color:var(--muted);letter-spacing:.04em;cursor:pointer;}
+  .nav{font-size:12px;color:#0f8b85;font-weight:800;letter-spacing:.04em;cursor:pointer;}
   .nav:hover{color:var(--accent);}
 
   .hero{margin:26px 0 8px;}
   .hero h2{font-family:var(--serif);font-size:clamp(27px,6.4vw,42px);font-weight:800;color:var(--ink);line-height:1.15;margin-bottom:18px;}
   .hero h2 em{font-style:normal;color:var(--accent);}
   .lede{font-size:14px;color:#5e564a;line-height:1.75;margin-bottom:14px;}
-  .lede b{color:var(--ink);font-weight:500;}
+  .lede b{color:var(--ink);font-weight:800;}
   .copyline{font-size:11px;color:#9a8f78;letter-spacing:.03em;margin-top:16px;border-inline-start:2px solid var(--line);padding-inline-start:12px;}
 
   .card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:22px;margin:18px 0;position:relative;overflow:hidden;box-shadow:0 2px 16px rgba(80,55,20,.05);}
@@ -100,16 +100,17 @@
   .jokecard{background:linear-gradient(135deg,#fdeede,#fce6dd);border:1px solid #f2d3c4;}
   .jk-q{font-family:var(--serif);font-size:14.5px;font-weight:600;color:#5a5142;line-height:1.6;margin-top:6px;}
   .refresh{font-size:11px;color:var(--accent);font-weight:700;cursor:pointer;margin-inline-start:auto;font-family:var(--mono);}
-  /* --- Décorations statiques --- */
-  #view-home{position:relative;}
-  .deco{position:absolute;pointer-events:none;user-select:none;-webkit-user-select:none;z-index:-1;}
-  .deco-cal{top:-22px;inset-inline-end:-28px;width:min(44vw,340px);opacity:.92;}
-  .deco-confetti{inset-inline-start:-32px;top:590px;width:min(16vw,110px);opacity:.9;}
-  .deco-charts{inset-inline-end:-16px;bottom:-24px;width:min(36vw,260px);opacity:.95;}
+  /* --- Décorations statiques (toutes les vues) --- */
+  .wrap{position:relative;}
+  header{position:relative;z-index:5;}
+  .deco{pointer-events:none;user-select:none;-webkit-user-select:none;}
+  .deco-cal{position:absolute;top:-12px;inset-inline-end:-42px;width:min(58vw,470px);z-index:-1;opacity:.95;}
+  .deco-confetti{position:fixed;inset-inline-start:-26px;top:36vh;width:min(15vw,105px);z-index:3;opacity:.95;}
+  .deco-charts{position:fixed;bottom:-18px;inset-inline-end:-14px;width:min(32vw,240px);z-index:3;}
   @media(max-width:560px){
     .deco-confetti{display:none;}
-    .deco-cal{width:52vw;top:-4px;opacity:.95;}
-    .deco-charts{width:36vw;}
+    .deco-cal{width:58vw;top:-8px;inset-inline-end:-30px;}
+    .deco-charts{width:30vw;}
   }
 
   .item{display:flex;align-items:center;gap:13px;background:var(--soft);border:1px solid var(--line);border-radius:12px;padding:13px 15px;margin-bottom:10px;cursor:pointer;transition:border-color .2s;}
@@ -136,7 +137,7 @@
   .legal{font-size:11px;color:#6e6556;line-height:1.7;}
   .legal h4{font-family:var(--serif);font-size:14px;color:var(--ink);margin:14px 0 6px;font-style:italic;}
   .foot{font-size:10px;color:#a99e86;letter-spacing:.05em;text-align:center;margin-top:30px;line-height:2;}
-  .foot a{color:var(--accent);text-decoration:none;}
+  .foot a{color:#0f8b85;font-weight:700;text-decoration:none;}
   .hidden{display:none!important;}
   input[type=file]{display:none;}
   .pill{display:inline-block;font-size:9px;letter-spacing:.06em;color:#fff;background:var(--grad);padding:2px 8px;border-radius:20px;text-transform:uppercase;vertical-align:middle;margin-inline-start:6px;}
@@ -144,6 +145,10 @@
 </head>
 <body>
 <div class="wrap">
+
+  <img class="deco deco-cal" src="deco-calendars.png" alt="" aria-hidden="true" />
+  <img class="deco deco-confetti" src="deco-confetti.png" alt="" aria-hidden="true" />
+  <img class="deco deco-charts" src="deco-charts.png" alt="" aria-hidden="true" />
 
   <header>
     <span id="logo-slot"></span>
@@ -153,9 +158,6 @@
   </header>
 
   <section id="view-home">
-    <img class="deco deco-cal" src="deco-calendars.png" alt="" aria-hidden="true" />
-    <img class="deco deco-confetti" src="deco-confetti.png" alt="" aria-hidden="true" />
-    <img class="deco deco-charts" src="deco-charts.png" alt="" aria-hidden="true" />
     <div style="margin:2px 0 0"><span class="nav" id="list-back" style="display:none"></span></div>
     <div class="hero">
       <h2 id="hero-title"></h2>
@@ -288,8 +290,8 @@ const SUPABASE_ANON = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFz
 
 const I18N={
  fr:{lang:'Français',navAccount:'Mon compte ›',heroT:'Et si vous comptiez vos jours,|pas seulement vos années&nbsp;?',
-  lede1:'Un <b>jouriversaire</b>, c\u2019est le jour où votre compteur de jours franchit un palier rond&nbsp;: 10\u202f000 jours, 20\u202f000 jours, 25\u202f000 jours…',
-  lede2:'Ces milliers de jours sont <b>plus rares</b> et surtout <b>imprévisibles</b>&nbsp;: contrairement à votre anniversaire, toujours à la même saison, un jouriversaire peut tomber en plein été, le suivant en plein hiver. Chacun est une vraie surprise — une occasion de célébrer là où on ne l\u2019attend pas.',
+  lede1:'Un <b>jouriversaire</b>, c\u2019est le jour où votre compteur de jours franchit un <b>palier rond</b>&nbsp;: 10\u202f000 jours, 20\u202f000 jours, 25\u202f000 jours…',
+  lede2:'Ces milliers de jours sont <b>plus rares</b> et surtout <b>imprévisibles</b>&nbsp;: contrairement à votre anniversaire, toujours à la même saison, un jouriversaire peut tomber en plein été, le suivant en plein hiver. Chacun est une <b>vraie surprise</b> — une occasion de célébrer là où on ne l\u2019attend pas.',
   copy:'« Jouriversaire » — concept et terme créés par Georges Viana. © 2026 Georges Viana. Tous droits réservés.',
   calc:'Calculez vos jouriversaires',fDate:'Date',fTime:'Heure (facultatif)',
   lifeTpl:'<b>{y}</b> ans · <b>{m}</b> mois · <b>{d}</b> jours',upLabel:'Prochains jouriversaires',daysWord:'jours',inDays:'dans {n} jours',
