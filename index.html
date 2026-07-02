@@ -104,12 +104,12 @@
   .wrap{position:relative;}
   header{position:relative;z-index:5;}
   .deco{pointer-events:none;user-select:none;-webkit-user-select:none;}
-  .deco-cal{position:absolute;top:-12px;inset-inline-end:-42px;width:min(58vw,470px);z-index:-1;opacity:.95;}
+  .deco-cal{position:absolute;top:2px;inset-inline-end:0;width:min(44vw,340px);z-index:-1;opacity:.95;}
   .deco-confetti{position:fixed;inset-inline-start:-26px;top:36vh;width:min(15vw,105px);z-index:3;opacity:.95;}
   .deco-charts{position:fixed;bottom:-18px;inset-inline-end:-14px;width:min(32vw,240px);z-index:3;}
   @media(max-width:560px){
     .deco-confetti{display:none;}
-    .deco-cal{width:58vw;top:-8px;inset-inline-end:-30px;}
+    .deco-cal{width:50vw;top:0;}
     .deco-charts{width:30vw;}
   }
 
@@ -137,16 +137,16 @@
   .legal{font-size:11px;color:#6e6556;line-height:1.7;}
   .legal h4{font-family:var(--serif);font-size:14px;color:var(--ink);margin:14px 0 6px;font-style:italic;}
   .foot{font-size:10px;color:#a99e86;letter-spacing:.05em;text-align:center;margin-top:30px;line-height:2;}
-  .foot a{color:#0f8b85;font-weight:700;text-decoration:none;}
+  .foot a{color:var(--coral);font-weight:800;text-decoration:none;}
   .hidden{display:none!important;}
   input[type=file]{display:none;}
   .pill{display:inline-block;font-size:9px;letter-spacing:.06em;color:#fff;background:var(--grad);padding:2px 8px;border-radius:20px;text-transform:uppercase;vertical-align:middle;margin-inline-start:6px;}
 </style>
 </head>
 <body>
+<img class="deco deco-cal" src="deco-calendars.png" alt="" aria-hidden="true" />
 <div class="wrap">
 
-  <img class="deco deco-cal" src="deco-calendars.png" alt="" aria-hidden="true" />
   <img class="deco deco-confetti" src="deco-confetti.png" alt="" aria-hidden="true" />
   <img class="deco deco-charts" src="deco-charts.png" alt="" aria-hidden="true" />
 
