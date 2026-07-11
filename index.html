@@ -97,9 +97,21 @@
   .surprise .xh{color:#fff;}
   .spbig{font-family:var(--serif);font-size:20px;font-weight:700;color:var(--goldc);margin:6px 0;}
   .surprise p{font-size:13.5px;color:#e6f0ee;line-height:1.65;}
-  .jokecard{background:linear-gradient(135deg,#fdeede,#fce6dd);border:1px solid #f2d3c4;}
-  .jk-q{font-family:var(--serif);font-size:14.5px;font-weight:600;color:#5a5142;line-height:1.6;margin-top:6px;}
-  .refresh{font-size:11px;color:var(--accent);font-weight:700;cursor:pointer;margin-inline-start:auto;font-family:var(--mono);}
+  .astrocard{background:linear-gradient(135deg,#f3edfb,#efe9f7);border:1px solid #ddd0ee;}
+  .astro-title{font-family:var(--serif);font-size:18px;font-weight:700;color:#5b4a86;margin:2px 0 4px;}
+  .astro-body{position:relative;overflow:hidden;transition:max-height .5s ease;}
+  .astro-body.clamped{max-height:150px;}
+  .astro-body.clamped::after{content:"";position:absolute;left:0;right:0;bottom:0;height:70px;
+    background:linear-gradient(transparent,#f1ebf9);pointer-events:none;}
+  .astro-intro{font-size:14px;color:#4a4258;line-height:1.6;margin-bottom:8px;}
+  .astro-disc{font-size:11.5px;color:#8a7f9a;font-style:italic;line-height:1.5;margin-bottom:12px;}
+  .astro-sec{margin-bottom:12px;}
+  .astro-h{font-family:var(--serif);font-size:14.5px;font-weight:700;color:#6a4a9a;margin-bottom:5px;}
+  .astro-sec ul{margin:0;padding-inline-start:18px;}
+  .astro-sec li{font-size:13.5px;color:#4a4258;line-height:1.55;margin-bottom:3px;}
+  .astro-sec p{font-size:13.5px;color:#4a4258;line-height:1.55;}
+  .astro-toggle{display:inline-block;margin-top:6px;font-size:12px;font-weight:800;color:#7a5ab5;
+    cursor:pointer;font-family:var(--mono);letter-spacing:.03em;}
   /* --- Décorations statiques (toutes les vues) --- */
   .wrap{position:relative;}
   header{position:relative;z-index:5;}
@@ -194,9 +206,11 @@
           <div class="spbig" id="sp-big"></div>
           <p id="sp-txt"></p>
         </div>
-        <div class="xcard jokecard">
-          <div class="xh">😄 <span id="jk-title"></span> <span class="refresh" id="jk-refresh"></span></div>
-          <p class="jk-q" id="jk-txt"></p>
+        <div class="xcard astrocard">
+          <div class="xh">🔮 <span id="astro-label"></span></div>
+          <div class="astro-title" id="astro-title"></div>
+          <div class="astro-body clamped" id="astro-body"></div>
+          <span class="astro-toggle" id="astro-toggle"></span>
         </div>
       </div>
     </div>
@@ -839,7 +853,7 @@ function applyLang(){
   $('lbl-calc').textContent=t('calc');$('lbl-date').textContent=t('fDate');$('lbl-time').textContent=t('fTime');
   $('lbl-up').textContent=t('upLabel');
   $('ex-title').textContent=t('exTitle');$('id-title').textContent=t('idTitle');$('id-sub').textContent=t('idSub');
-  $('sp-title').textContent=t('spTitle');$('jk-title').textContent=t('jkTitle');$('jk-refresh').textContent=t('jkMore');
+  $('sp-title').textContent=t('spTitle');$('astro-label').textContent=t('astroLabel');if(astroOpen){$('astro-toggle').textContent=t('astroLess');}else{$('astro-toggle').textContent=t('astroToggle');}
   $('lbl-keep').textContent=t('keep');$('txt-keep').innerHTML=t('keepDesc');$('cta-account').textContent=t('createAcc');
   $('nav-account').textContent=t('navAccount');
   $('back-home').textContent=t('backCalc');$('back-home2').textContent=t('back');
@@ -889,6 +903,306 @@ function renderCalc(){
   calcTick=setInterval(()=>{const cc=counts(calcDate,new Date());['secondes','minutes','heures'].forEach(u=>{const e=$('cv-'+u);if(e)e.textContent=fmt(cc[u]);});},1000);
   renderExtras(dt,c);
 }
+/* ============================================================
+   PROFIL ZODIACAL MIXTE (occidental + chinois) — génératif
+   Remplace la "blague du jour".
+   Adjectifs de synthèse accordés au féminin (personnalité / combinaison).
+   ============================================================ */
+const ASTRO={};
+
+ASTRO.fr={
+ intro:'En combinant le {w} (astrologie occidentale) et le {c} (astrologie chinoise), on obtient un profil souvent décrit comme {t1} et {t2}.',
+ disclaimer:'L\u2019astrologie n\u2019est pas une science : ces descriptions relèvent de traditions culturelles, pas de faits établis.',
+ hStrength:'Points forts',hAct:'Façon d\u2019agir',hWatch:'Points de vigilance',
+ hLove:'En amour',hWork:'Au travail',hBest:'Principale qualité',hWorst:'Principal défaut',
+ hSum:'En résumé',
+ sumTpl:'La combinaison {w} + {c} est traditionnellement associée à une personnalité {t1}, {t2} et {t3}, qui doit veiller à ne pas tomber dans {vice}.',
+ actGeneric:['préparer ses actions plutôt qu\u2019improviser','privilégier les relations profondes aux liens superficiels','se tourner vers les domaines où l\u2019on résout des problèmes'],
+ /* ZW : a=[synthèse fém., adj masc.], f=force, l=amour, w=[métiers], wt=vigilance occ. */
+ ZW:[
+  {a:['énergique','pionnier'],f:'un allant qui entraîne les autres',l:'ardent et direct',w:['entrepreneuriat','sport de haut niveau','management d\u2019équipe'],wt:'l\u2019impatience et l\u2019impulsivité'},
+  {a:['tenace','posé'],f:'une constance à toute épreuve',l:'fidèle et sensuel',w:['finance','gastronomie','immobilier'],wt:'l\u2019obstination et la résistance au changement'},
+  {a:['vive','curieux'],f:'une agilité d\u2019esprit rare',l:'léger et complice',w:['communication','commerce','journalisme'],wt:'la dispersion et l\u2019inconstance'},
+  {a:['sensible','protecteur'],f:'une mémoire du cœur remarquable',l:'tendre et loyal',w:['soin','éducation','métiers de la famille'],wt:'l\u2019hypersensibilité et le repli'},
+  {a:['rayonnante','généreux'],f:'un charisme qui inspire',l:'passionné et fier',w:['direction','scène','création'],wt:'l\u2019orgueil et le besoin de reconnaissance'},
+  {a:['méthodique','rigoureux'],f:'un sens du détail précieux',l:'attentionné et discret',w:['analyse','santé','artisanat de précision'],wt:'l\u2019excès de critique et le perfectionnisme'},
+  {a:['diplomate','esthète'],f:'un art de créer l\u2019harmonie',l:'romantique et attentif',w:['droit','design','médiation'],wt:'l\u2019indécision et l\u2019évitement des conflits'},
+  {a:['intense','stratégique'],f:'une capacité à rester lucide sous pression',l:'passionné et protecteur',w:['stratégie','finance','psychologie','sécurité ou renseignement'],wt:'la méfiance et le besoin de tout contrôler'},
+  {a:['aventurière','optimiste'],f:'un souffle qui ouvre des horizons',l:'libre et enthousiaste',w:['voyage','enseignement','entrepreneuriat'],wt:'l\u2019impatience et la difficulté à se poser'},
+  {a:['ambitieuse','persévérant'],f:'une endurance qui construit dans la durée',l:'sérieux et engagé',w:['direction d\u2019entreprise','ingénierie','institutions'],wt:'la rigidité et l\u2019excès de sérieux'},
+  {a:['originale','indépendant'],f:'une vision en avance sur son temps',l:'libre et sincère',w:['innovation','sciences','causes collectives'],wt:'le détachement et l\u2019imprévisibilité'},
+  {a:['intuitive','empathique'],f:'une sensibilité qui devine l\u2019invisible',l:'dévoué et rêveur',w:['arts','soin','spiritualité'],wt:'l\u2019évasion et l\u2019influençabilité'}
+ ],
+ /* ZC : a=[synthèse fém., adj masc.], t=trait, v=vigilance chinoise */
+ ZC:[
+  {a:['maligne','charmeur'],t:'un flair pour saisir les opportunités',v:'l\u2019anxiété ou l\u2019opportunisme'},
+  {a:['fiable','patient'],t:'une force tranquille et travailleuse',v:'l\u2019entêtement'},
+  {a:['courageuse','magnétique'],t:'une audace qui force le respect',v:'l\u2019impulsivité'},
+  {a:['délicate','prudent'],t:'une élégance apaisante',v:'l\u2019évitement des conflits'},
+  {a:['charismatique','ambitieux'],t:'une présence qui ne passe pas inaperçue',v:'l\u2019orgueil'},
+  {a:['intuitive','perspicace'],t:'une profondeur stratégique',v:'la méfiance ou le besoin de tout contrôler'},
+  {a:['dynamique','sociable'],t:'un enthousiasme communicatif',v:'l\u2019impatience'},
+  {a:['créative','doux'],t:'une sensibilité artistique',v:'l\u2019indécision'},
+  {a:['inventive','malin'],t:'une vivacité pleine de ressources',v:'la dispersion'},
+  {a:['consciencieuse','franc'],t:'un sens aigu du devoir',v:'la tendance à trop critiquer'},
+  {a:['loyale','juste'],t:'un attachement sincère à ses proches',v:'l\u2019inquiétude'},
+  {a:['généreuse','sincère'],t:'une bienveillance désarmante',v:'la naïveté'}
+ ]
+};
+
+ASTRO.en={
+ intro:'Combining {w} (Western astrology) with the {c} (Chinese astrology) gives a profile often described as {t1} and {t2}.',
+ disclaimer:'Astrology isn\u2019t a science: these descriptions come from cultural traditions, not established facts.',
+ hStrength:'Strengths',hAct:'How they act',hWatch:'Points to watch',
+ hLove:'In love',hWork:'At work',hBest:'Main strength',hWorst:'Main flaw',
+ hSum:'In short',
+ sumTpl:'The {w} + {c} blend is traditionally linked to a {t1}, {t2} and {t3} personality, which should avoid falling into {vice}.',
+ actGeneric:['preparing rather than improvising','valuing deep bonds over shallow ones','gravitating to fields where problems get solved'],
+ ZW:[
+  {a:['energetic','pioneering'],f:'a drive that pulls others along',l:'ardent and direct',w:['entrepreneurship','elite sport','team leadership'],wt:'impatience and impulsiveness'},
+  {a:['tenacious','steady'],f:'unshakeable consistency',l:'loyal and sensual',w:['finance','gastronomy','real estate'],wt:'stubbornness and resistance to change'},
+  {a:['quick','curious'],f:'rare mental agility',l:'light and playful',w:['communication','trade','journalism'],wt:'scattered focus and inconstancy'},
+  {a:['sensitive','protective'],f:'a remarkable memory of the heart',l:'tender and loyal',w:['care','education','family-oriented work'],wt:'over-sensitivity and withdrawal'},
+  {a:['radiant','generous'],f:'inspiring charisma',l:'passionate and proud',w:['leadership','stage','creative work'],wt:'pride and a need for recognition'},
+  {a:['methodical','rigorous'],f:'a precious eye for detail',l:'caring and discreet',w:['analysis','health','fine craftsmanship'],wt:'over-criticism and perfectionism'},
+  {a:['diplomatic','aesthetic'],f:'an art of creating harmony',l:'romantic and attentive',w:['law','design','mediation'],wt:'indecision and conflict avoidance'},
+  {a:['intense','strategic'],f:'staying clear-headed under pressure',l:'passionate and protective',w:['strategy','finance','psychology','security or intelligence'],wt:'distrust and the need to control everything'},
+  {a:['adventurous','optimistic'],f:'a spirit that opens horizons',l:'free and enthusiastic',w:['travel','teaching','entrepreneurship'],wt:'impatience and restlessness'},
+  {a:['ambitious','persevering'],f:'endurance that builds over time',l:'serious and committed',w:['company leadership','engineering','institutions'],wt:'rigidity and over-seriousness'},
+  {a:['original','independent'],f:'a vision ahead of its time',l:'free and sincere',w:['innovation','sciences','collective causes'],wt:'detachment and unpredictability'},
+  {a:['intuitive','empathetic'],f:'a sensitivity that senses the invisible',l:'devoted and dreamy',w:['the arts','care','spirituality'],wt:'escapism and being easily influenced'}
+ ],
+ ZC:[
+  {a:['resourceful','charming'],t:'a knack for seizing opportunities',v:'anxiety or opportunism'},
+  {a:['reliable','patient'],t:'a calm, hard-working strength',v:'stubbornness'},
+  {a:['brave','magnetic'],t:'boldness that commands respect',v:'impulsiveness'},
+  {a:['gentle','careful'],t:'a soothing elegance',v:'conflict avoidance'},
+  {a:['charismatic','ambitious'],t:'a presence that never goes unnoticed',v:'pride'},
+  {a:['intuitive','perceptive'],t:'strategic depth',v:'distrust or the need to control everything'},
+  {a:['dynamic','sociable'],t:'contagious enthusiasm',v:'impatience'},
+  {a:['creative','soft'],t:'artistic sensitivity',v:'indecision'},
+  {a:['inventive','clever'],t:'quick-witted resourcefulness',v:'scattered focus'},
+  {a:['conscientious','frank'],t:'a sharp sense of duty',v:'over-criticising'},
+  {a:['loyal','fair'],t:'sincere attachment to loved ones',v:'worry'},
+  {a:['generous','sincere'],t:'disarming kindness',v:'naivety'}
+ ]
+};
+
+
+ASTRO.es={
+ intro:'Combinando {w} (astrología occidental) con la {c} (astrología china) se obtiene un perfil descrito a menudo como {t1} y {t2}.',
+ disclaimer:'La astrología no es una ciencia: estas descripciones provienen de tradiciones culturales, no de hechos comprobados.',
+ hStrength:'Puntos fuertes',hAct:'Su forma de actuar',hWatch:'Puntos de atención',
+ hLove:'En el amor',hWork:'En el trabajo',hBest:'Principal cualidad',hWorst:'Principal defecto',
+ hSum:'En resumen',
+ sumTpl:'La combinación {w} + {c} se asocia tradicionalmente con una personalidad {t1}, {t2} y {t3}, que debe evitar caer en {vice}.',
+ actGeneric:['preparar sus acciones en lugar de improvisar','valorar los vínculos profundos frente a los superficiales','orientarse hacia ámbitos donde se resuelven problemas'],
+ ZW:[
+  {a:['enérgica','pionero'],f:'un empuje que arrastra a los demás',l:'ardiente y directo',w:['emprendimiento','deporte de élite','dirección de equipos'],wt:'la impaciencia y la impulsividad'},
+  {a:['tenaz','tranquilo'],f:'una constancia a toda prueba',l:'fiel y sensual',w:['finanzas','gastronomía','inmobiliario'],wt:'la obstinación y la resistencia al cambio'},
+  {a:['vivaz','curioso'],f:'una agilidad mental poco común',l:'ligero y cómplice',w:['comunicación','comercio','periodismo'],wt:'la dispersión y la inconstancia'},
+  {a:['sensible','protector'],f:'una memoria del corazón notable',l:'tierno y leal',w:['cuidados','educación','ámbito familiar'],wt:'la hipersensibilidad y el retraimiento'},
+  {a:['radiante','generoso'],f:'un carisma que inspira',l:'apasionado y orgulloso',w:['dirección','escena','creación'],wt:'el orgullo y la necesidad de reconocimiento'},
+  {a:['metódica','riguroso'],f:'un sentido del detalle valioso',l:'atento y discreto',w:['análisis','salud','artesanía de precisión'],wt:'el exceso de crítica y el perfeccionismo'},
+  {a:['diplomática','esteta'],f:'un arte para crear armonía',l:'romántico y atento',w:['derecho','diseño','mediación'],wt:'la indecisión y la evitación de conflictos'},
+  {a:['intensa','estratega'],f:'la capacidad de mantener la lucidez bajo presión',l:'apasionado y protector',w:['estrategia','finanzas','psicología','seguridad o inteligencia'],wt:'la desconfianza y la necesidad de controlarlo todo'},
+  {a:['aventurera','optimista'],f:'un impulso que abre horizontes',l:'libre y entusiasta',w:['viajes','enseñanza','emprendimiento'],wt:'la impaciencia y la dificultad para asentarse'},
+  {a:['ambiciosa','perseverante'],f:'una resistencia que construye a largo plazo',l:'serio y comprometido',w:['dirección de empresa','ingeniería','instituciones'],wt:'la rigidez y el exceso de seriedad'},
+  {a:['original','independiente'],f:'una visión adelantada a su tiempo',l:'libre y sincero',w:['innovación','ciencias','causas colectivas'],wt:'el desapego y la imprevisibilidad'},
+  {a:['intuitiva','empático'],f:'una sensibilidad que percibe lo invisible',l:'entregado y soñador',w:['artes','cuidados','espiritualidad'],wt:'la evasión y la facilidad para dejarse influir'}
+ ],
+ ZC:[
+  {a:['ingeniosa','encantador'],t:'olfato para aprovechar las oportunidades',v:'la ansiedad o el oportunismo'},
+  {a:['fiable','paciente'],t:'una fuerza tranquila y trabajadora',v:'la terquedad'},
+  {a:['valiente','magnético'],t:'una audacia que impone respeto',v:'la impulsividad'},
+  {a:['delicada','prudente'],t:'una elegancia serena',v:'la evitación de conflictos'},
+  {a:['carismática','ambicioso'],t:'una presencia que no pasa desapercibida',v:'el orgullo'},
+  {a:['intuitiva','perspicaz'],t:'una profundidad estratégica',v:'la desconfianza o la necesidad de controlarlo todo'},
+  {a:['dinámica','sociable'],t:'un entusiasmo contagioso',v:'la impaciencia'},
+  {a:['creativa','dulce'],t:'una sensibilidad artística',v:'la indecisión'},
+  {a:['inventiva','astuto'],t:'una viveza llena de recursos',v:'la dispersión'},
+  {a:['concienzuda','franco'],t:'un agudo sentido del deber',v:'la tendencia a criticar demasiado'},
+  {a:['leal','justo'],t:'un apego sincero a los suyos',v:'la inquietud'},
+  {a:['generosa','sincero'],t:'una bondad desarmante',v:'la ingenuidad'}
+ ]
+};
+
+ASTRO.pt={
+ intro:'Combinando {w} (astrologia ocidental) com a {c} (astrologia chinesa), obtém-se um perfil frequentemente descrito como {t1} e {t2}.',
+ disclaimer:'A astrologia não é uma ciência: estas descrições vêm de tradições culturais, não de factos comprovados.',
+ hStrength:'Pontos fortes',hAct:'A sua forma de agir',hWatch:'Pontos de atenção',
+ hLove:'No amor',hWork:'No trabalho',hBest:'Principal qualidade',hWorst:'Principal defeito',
+ hSum:'Em resumo',
+ sumTpl:'A combinação {w} + {c} está tradicionalmente associada a uma personalidade {t1}, {t2} e {t3}, que deve evitar cair em {vice}.',
+ actGeneric:['preparar as suas ações em vez de improvisar','valorizar os laços profundos em vez dos superficiais','orientar-se para áreas onde se resolvem problemas'],
+ ZW:[
+  {a:['enérgica','pioneiro'],f:'um ímpeto que arrasta os outros',l:'ardente e direto',w:['empreendedorismo','desporto de elite','gestão de equipas'],wt:'a impaciência e a impulsividade'},
+  {a:['tenaz','tranquilo'],f:'uma constância à toda a prova',l:'fiel e sensual',w:['finanças','gastronomia','imobiliário'],wt:'a obstinação e a resistência à mudança'},
+  {a:['viva','curioso'],f:'uma agilidade mental rara',l:'leve e cúmplice',w:['comunicação','comércio','jornalismo'],wt:'a dispersão e a inconstância'},
+  {a:['sensível','protetor'],f:'uma memória do coração notável',l:'terno e leal',w:['cuidados','educação','área familiar'],wt:'a hipersensibilidade e o recolhimento'},
+  {a:['radiante','generoso'],f:'um carisma que inspira',l:'apaixonado e orgulhoso',w:['direção','palco','criação'],wt:'o orgulho e a necessidade de reconhecimento'},
+  {a:['metódica','rigoroso'],f:'um sentido de detalhe precioso',l:'atencioso e discreto',w:['análise','saúde','artesanato de precisão'],wt:'o excesso de crítica e o perfeccionismo'},
+  {a:['diplomata','esteta'],f:'uma arte de criar harmonia',l:'romântico e atento',w:['direito','design','mediação'],wt:'a indecisão e a fuga aos conflitos'},
+  {a:['intensa','estratega'],f:'a capacidade de manter a lucidez sob pressão',l:'apaixonado e protetor',w:['estratégia','finanças','psicologia','segurança ou informações'],wt:'a desconfiança e a necessidade de controlar tudo'},
+  {a:['aventureira','otimista'],f:'um sopro que abre horizontes',l:'livre e entusiasta',w:['viagens','ensino','empreendedorismo'],wt:'a impaciência e a dificuldade em assentar'},
+  {a:['ambiciosa','perseverante'],f:'uma resistência que constrói a longo prazo',l:'sério e comprometido',w:['direção de empresa','engenharia','instituições'],wt:'a rigidez e o excesso de seriedade'},
+  {a:['original','independente'],f:'uma visão à frente do seu tempo',l:'livre e sincero',w:['inovação','ciências','causas coletivas'],wt:'o distanciamento e a imprevisibilidade'},
+  {a:['intuitiva','empático'],f:'uma sensibilidade que percebe o invisível',l:'dedicado e sonhador',w:['artes','cuidados','espiritualidade'],wt:'a fuga e a facilidade em deixar-se influenciar'}
+ ],
+ ZC:[
+  {a:['engenhosa','encantador'],t:'faro para agarrar oportunidades',v:'a ansiedade ou o oportunismo'},
+  {a:['fiável','paciente'],t:'uma força tranquila e trabalhadora',v:'a teimosia'},
+  {a:['corajosa','magnético'],t:'uma audácia que impõe respeito',v:'a impulsividade'},
+  {a:['delicada','prudente'],t:'uma elegância serena',v:'a fuga aos conflitos'},
+  {a:['carismática','ambicioso'],t:'uma presença que não passa despercebida',v:'o orgulho'},
+  {a:['intuitiva','perspicaz'],t:'uma profundidade estratégica',v:'a desconfiança ou a necessidade de controlar tudo'},
+  {a:['dinâmica','sociável'],t:'um entusiasmo contagiante',v:'a impaciência'},
+  {a:['criativa','doce'],t:'uma sensibilidade artística',v:'a indecisão'},
+  {a:['inventiva','astuto'],t:'uma vivacidade cheia de recursos',v:'a dispersão'},
+  {a:['conscienciosa','franco'],t:'um apurado sentido do dever',v:'a tendência para criticar demais'},
+  {a:['leal','justo'],t:'um apego sincero aos seus',v:'a inquietação'},
+  {a:['generosa','sincero'],t:'uma bondade desarmante',v:'a ingenuidade'}
+ ]
+};
+
+ASTRO.de={
+ intro:'Die Verbindung von {w} (westliche Astrologie) und {c} (chinesische Astrologie) ergibt ein Profil, das oft als {t1} und {t2} beschrieben wird.',
+ disclaimer:'Astrologie ist keine Wissenschaft: Diese Beschreibungen stammen aus kulturellen Traditionen, nicht aus gesicherten Fakten.',
+ hStrength:'Stärken',hAct:'Ihre Handlungsweise',hWatch:'Worauf zu achten ist',
+ hLove:'In der Liebe',hWork:'Im Beruf',hBest:'Größte Stärke',hWorst:'Größte Schwäche',
+ hSum:'Kurz gesagt',
+ sumTpl:'Die Kombination {w} + {c} wird traditionell mit einer {t1}, {t2} und {t3} Persönlichkeit verbunden, die {vice} vermeiden sollte.',
+ actGeneric:['lieber vorbereiten als improvisieren','tiefe Bindungen oberflächlichen vorziehen','sich Bereichen zuwenden, in denen Probleme gelöst werden'],
+ ZW:[
+  {a:['energisch','pionierhaft'],f:'ein Schwung, der andere mitreißt',l:'leidenschaftlich und direkt',w:['Unternehmertum','Spitzensport','Teamführung'],wt:'Ungeduld und Impulsivität'},
+  {a:['beharrlich','ruhig'],f:'unerschütterliche Beständigkeit',l:'treu und sinnlich',w:['Finanzen','Gastronomie','Immobilien'],wt:'Sturheit und Veränderungswiderstand'},
+  {a:['lebhaft','neugierig'],f:'seltene geistige Beweglichkeit',l:'leicht und verspielt',w:['Kommunikation','Handel','Journalismus'],wt:'Zerstreutheit und Unbeständigkeit'},
+  {a:['sensibel','beschützend'],f:'ein bemerkenswertes Gedächtnis des Herzens',l:'zärtlich und loyal',w:['Pflege','Bildung','familiennahe Berufe'],wt:'Überempfindlichkeit und Rückzug'},
+  {a:['strahlend','großzügig'],f:'inspirierendes Charisma',l:'leidenschaftlich und stolz',w:['Leitung','Bühne','Kreatives'],wt:'Stolz und das Bedürfnis nach Anerkennung'},
+  {a:['methodisch','gründlich'],f:'ein wertvoller Sinn fürs Detail',l:'fürsorglich und diskret',w:['Analyse','Gesundheit','Feinhandwerk'],wt:'übermäßige Kritik und Perfektionismus'},
+  {a:['diplomatisch','ästhetisch'],f:'die Kunst, Harmonie zu schaffen',l:'romantisch und aufmerksam',w:['Recht','Design','Mediation'],wt:'Unentschlossenheit und Konfliktvermeidung'},
+  {a:['intensiv','strategisch'],f:'unter Druck klar zu bleiben',l:'leidenschaftlich und beschützend',w:['Strategie','Finanzen','Psychologie','Sicherheit oder Nachrichtendienst'],wt:'Misstrauen und der Drang, alles zu kontrollieren'},
+  {a:['abenteuerlustig','optimistisch'],f:'ein Schwung, der Horizonte öffnet',l:'frei und begeistert',w:['Reisen','Lehre','Unternehmertum'],wt:'Ungeduld und Ruhelosigkeit'},
+  {a:['ehrgeizig','ausdauernd'],f:'Ausdauer, die langfristig aufbaut',l:'ernst und verbindlich',w:['Unternehmensführung','Ingenieurwesen','Institutionen'],wt:'Starrheit und übertriebener Ernst'},
+  {a:['originell','unabhängig'],f:'eine Vision, die ihrer Zeit voraus ist',l:'frei und aufrichtig',w:['Innovation','Wissenschaft','gemeinsame Anliegen'],wt:'Distanziertheit und Unberechenbarkeit'},
+  {a:['intuitiv','einfühlsam'],f:'ein Gespür für das Unsichtbare',l:'hingebungsvoll und verträumt',w:['Kunst','Pflege','Spiritualität'],wt:'Realitätsflucht und Beeinflussbarkeit'}
+ ],
+ ZC:[
+  {a:['findig','charmant'],t:'ein Gespür, Gelegenheiten zu nutzen',v:'Angst oder Opportunismus'},
+  {a:['zuverlässig','geduldig'],t:'eine ruhige, fleißige Kraft',v:'Sturheit'},
+  {a:['mutig','magnetisch'],t:'ein Wagemut, der Respekt einflößt',v:'Impulsivität'},
+  {a:['feinfühlig','vorsichtig'],t:'eine beruhigende Eleganz',v:'Konfliktvermeidung'},
+  {a:['charismatisch','ehrgeizig'],t:'eine Präsenz, die auffällt',v:'Stolz'},
+  {a:['intuitiv','scharfsinnig'],t:'strategische Tiefe',v:'Misstrauen oder der Drang, alles zu kontrollieren'},
+  {a:['dynamisch','gesellig'],t:'ansteckende Begeisterung',v:'Ungeduld'},
+  {a:['kreativ','sanft'],t:'künstlerische Sensibilität',v:'Unentschlossenheit'},
+  {a:['erfinderisch','clever'],t:'eine einfallsreiche Lebendigkeit',v:'Zerstreutheit'},
+  {a:['gewissenhaft','offen'],t:'ein ausgeprägter Pflichtsinn',v:'die Neigung, zu viel zu kritisieren'},
+  {a:['loyal','gerecht'],t:'eine aufrichtige Verbundenheit mit den Nächsten',v:'Sorge'},
+  {a:['großzügig','aufrichtig'],t:'eine entwaffnende Güte',v:'Naivität'}
+ ]
+};
+
+ASTRO.it={
+ intro:'Combinando {w} (astrologia occidentale) con il {c} (astrologia cinese) si ottiene un profilo spesso descritto come {t1} e {t2}.',
+ disclaimer:'L\u2019astrologia non è una scienza: queste descrizioni derivano da tradizioni culturali, non da fatti accertati.',
+ hStrength:'Punti di forza',hAct:'Il loro modo di agire',hWatch:'Punti di attenzione',
+ hLove:'In amore',hWork:'Nel lavoro',hBest:'Qualità principale',hWorst:'Difetto principale',
+ hSum:'In sintesi',
+ sumTpl:'La combinazione {w} + {c} è tradizionalmente associata a una personalità {t1}, {t2} e {t3}, che deve evitare di cadere in {vice}.',
+ actGeneric:['preparare le proprie azioni invece di improvvisare','privilegiare i legami profondi a quelli superficiali','orientarsi verso ambiti in cui si risolvono problemi'],
+ ZW:[
+  {a:['energica','pioniere'],f:'uno slancio che trascina gli altri',l:'ardente e diretto',w:['imprenditoria','sport di alto livello','gestione di team'],wt:'l\u2019impazienza e l\u2019impulsività'},
+  {a:['tenace','pacato'],f:'una costanza a tutta prova',l:'fedele e sensuale',w:['finanza','gastronomia','immobiliare'],wt:'l\u2019ostinazione e la resistenza al cambiamento'},
+  {a:['vivace','curioso'],f:'una rara agilità mentale',l:'leggero e complice',w:['comunicazione','commercio','giornalismo'],wt:'la dispersione e l\u2019incostanza'},
+  {a:['sensibile','protettivo'],f:'una notevole memoria del cuore',l:'tenero e leale',w:['cura','educazione','ambito familiare'],wt:'l\u2019ipersensibilità e il ritiro'},
+  {a:['radiosa','generoso'],f:'un carisma che ispira',l:'appassionato e fiero',w:['direzione','palcoscenico','creazione'],wt:'l\u2019orgoglio e il bisogno di riconoscimento'},
+  {a:['metodica','rigoroso'],f:'un prezioso senso del dettaglio',l:'premuroso e discreto',w:['analisi','salute','artigianato di precisione'],wt:'l\u2019eccesso di critica e il perfezionismo'},
+  {a:['diplomatica','esteta'],f:'un\u2019arte nel creare armonia',l:'romantico e attento',w:['diritto','design','mediazione'],wt:'l\u2019indecisione e l\u2019evitare i conflitti'},
+  {a:['intensa','stratega'],f:'la capacità di restare lucido sotto pressione',l:'appassionato e protettivo',w:['strategia','finanza','psicologia','sicurezza o intelligence'],wt:'la diffidenza e il bisogno di controllare tutto'},
+  {a:['avventurosa','ottimista'],f:'uno slancio che apre orizzonti',l:'libero ed entusiasta',w:['viaggi','insegnamento','imprenditoria'],wt:'l\u2019impazienza e la difficoltà a fermarsi'},
+  {a:['ambiziosa','perseverante'],f:'una tenacia che costruisce nel tempo',l:'serio e impegnato',w:['direzione d\u2019impresa','ingegneria','istituzioni'],wt:'la rigidità e l\u2019eccesso di serietà'},
+  {a:['originale','indipendente'],f:'una visione in anticipo sui tempi',l:'libero e sincero',w:['innovazione','scienze','cause collettive'],wt:'il distacco e l\u2019imprevedibilità'},
+  {a:['intuitiva','empatico'],f:'una sensibilità che percepisce l\u2019invisibile',l:'devoto e sognatore',w:['arti','cura','spiritualità'],wt:'l\u2019evasione e la facilità a farsi influenzare'}
+ ],
+ ZC:[
+  {a:['ingegnosa','affascinante'],t:'un fiuto per cogliere le occasioni',v:'l\u2019ansia o l\u2019opportunismo'},
+  {a:['affidabile','paziente'],t:'una forza tranquilla e laboriosa',v:'la testardaggine'},
+  {a:['coraggiosa','magnetico'],t:'un\u2019audacia che impone rispetto',v:'l\u2019impulsività'},
+  {a:['delicata','prudente'],t:'un\u2019eleganza rasserenante',v:'l\u2019evitare i conflitti'},
+  {a:['carismatica','ambizioso'],t:'una presenza che non passa inosservata',v:'l\u2019orgoglio'},
+  {a:['intuitiva','perspicace'],t:'una profondità strategica',v:'la diffidenza o il bisogno di controllare tutto'},
+  {a:['dinamica','socievole'],t:'un entusiasmo contagioso',v:'l\u2019impazienza'},
+  {a:['creativa','dolce'],t:'una sensibilità artistica',v:'l\u2019indecisione'},
+  {a:['inventiva','astuto'],t:'una vivacità piena di risorse',v:'la dispersione'},
+  {a:['coscienziosa','franco'],t:'un acuto senso del dovere',v:'la tendenza a criticare troppo'},
+  {a:['leale','giusto'],t:'un attaccamento sincero ai propri cari',v:'l\u2019inquietudine'},
+  {a:['generosa','sincero'],t:'una bontà disarmante',v:'l\u2019ingenuità'}
+ ]
+};
+
+const ASTRO_CELEB={
+ '7-5':['Pablo Picasso','Bill Gates','Hillary Clinton'],
+ '0-4':['Robert Downey Jr.','Leonardo da Vinci'],
+ '4-2':['Barack Obama','Coco Chanel'],
+ '9-9':['Isaac Newton','Michelle Obama'],
+ '2-7':['Bob Dylan','Angelina Jolie'],
+ '11-8':['Albert Einstein','Steve Jobs'],
+ '5-0':['Mère Teresa','Beyoncé'],
+ '1-1':['William Shakespeare','Adele'],
+ '3-3':['Lionel Messi','Ariana Grande'],
+ '8-10':['Walt Disney','Brad Pitt'],
+ '10-11':['Bob Marley','Cristiano Ronaldo'],
+ '6-4':['John Lennon','Gwyneth Paltrow']
+};
+
+/* Libellés d'interface dans les 18 langues */
+(function(){
+ var LAB={fr:'Profil zodiacal mixte',en:'Mixed zodiac profile',es:'Perfil zodiacal mixto',pt:'Perfil zodiacal misto',de:'Gemischtes Sternzeichen-Profil',it:'Profilo zodiacale misto',nl:'Gemengd sterrenbeeldprofiel',sv:'Blandad stjärnteckenprofil',no:'Blandet stjernetegnsprofil',pl:'Mieszany profil zodiaku',ru:'Смешанный зодиакальный профиль',uk:'Змішаний зодіакальний профіль',el:'Μεικτό ζωδιακό προφίλ',he:'פרופיל גלגל מזלות משולב',ar:'الملف الفلكي المختلط',zh:'混合星座画像',ja:'複合星座プロフィール',ko:'혼합 별자리 프로필'};
+ var MORE={fr:'déplier',en:'expand',es:'ver más',pt:'ver mais',de:'mehr',it:'espandi',nl:'meer',sv:'visa mer',no:'vis mer',pl:'rozwiń',ru:'подробнее',uk:'детальніше',el:'περισσότερα',he:'הרחבה',ar:'المزيد',zh:'展开',ja:'開く',ko:'펼치기'};
+ var LESS={fr:'replier',en:'collapse',es:'ver menos',pt:'ver menos',de:'weniger',it:'riduci',nl:'minder',sv:'visa mindre',no:'vis mindre',pl:'zwiń',ru:'свернуть',uk:'згорнути',el:'λιγότερα',he:'צמצום',ar:'أقل',zh:'收起',ja:'閉じる',ko:'접기'};
+ var CEL={fr:'Quelques personnalités',en:'A few well-known people',es:'Algunas personalidades',pt:'Algumas personalidades',de:'Einige bekannte Personen',it:'Alcune personalità',nl:'Enkele bekende namen',sv:'Några kända personer',no:'Noen kjente personer',pl:'Kilka znanych osób',ru:'Несколько известных людей',uk:'Кілька відомих людей',el:'Μερικές γνωστές προσωπικότητες',he:'כמה דמויות מוכרות',ar:'بعض الشخصيات المعروفة',zh:'一些名人',ja:'著名人の例',ko:'유명 인물'};
+ Object.keys(I18N).forEach(function(k){
+  if(!I18N[k].astroLabel)I18N[k].astroLabel=LAB[k]||LAB.en;
+  if(!I18N[k].astroToggle)I18N[k].astroToggle=MORE[k]||MORE.en;
+  if(!I18N[k].astroLess)I18N[k].astroLess=LESS[k]||LESS.en;
+  if(!I18N[k].astroCeleb)I18N[k].astroCeleb=CEL[k]||CEL.en;
+ });
+})();
+
+function cap(s){return s?s.charAt(0).toUpperCase()+s.slice(1):s;}
+function renderAstro(zi,ci){
+  var en=ASTRO.en, A=ASTRO[L]||en;
+  var wArr=t('zodiac'), cArr=t('cnz'), wName=wArr[zi], cName=cArr[ci];
+  var W=(A.ZW&&A.ZW[zi])?A.ZW[zi]:en.ZW[zi];
+  var C=(A.ZC&&A.ZC[ci])?A.ZC[ci]:en.ZC[ci];
+  function fill(s,o){return s.replace(/\{(\w+)\}/g,function(_,k){return o[k]!=null?o[k]:'';});}
+  function norm(s){return (''+s).toLowerCase().replace(/[’']/g,'\u2019').trim();}
+  function uniq(arr){var seen={},out=[];arr.forEach(function(x){if(!x)return;var n=norm(x);if(!seen[n]){seen[n]=1;out.push(x);}});return out;}
+  var t1=W.a[0], t2=(norm(C.a[0])===norm(W.a[0])&&C.a[1])?C.a[1]:C.a[0], t3=W.a[1]||W.a[0];
+  var wEmo=['\u2648','\u2649','\u264a','\u264b','\u264c','\u264d','\u264e','\u264f','\u2650','\u2651','\u2652','\u2653'][zi];
+  var cEmo=['\ud83d\udc2d','\ud83d\udc2e','\ud83d\udc2f','\ud83d\udc30','\ud83d\udc32','\ud83d\udc0d','\ud83d\udc34','\ud83d\udc10','\ud83d\udc35','\ud83d\udc14','\ud83d\udc36','\ud83d\udc37'][ci];
+  function sec(h,items){items=uniq(items);var x='<div class="astro-sec"><div class="astro-h">'+esc(h)+'</div><ul>';items.forEach(function(i){x+='<li>'+esc(i)+'</li>';});return x+'</ul></div>';}
+  function secP(h,p){return '<div class="astro-sec"><div class="astro-h">'+esc(h)+'</div><p>'+esc(p)+'</p></div>';}
+
+  // adjectifs combinés (dédupliqués) pour la puce de synthèse des forces
+  var combo=uniq([cap(W.a[1]||W.a[0]),cap(C.a[1]||C.a[0])]).join(' \u00b7 ');
+  var H='';
+  H+='<p class="astro-intro">'+esc(fill(A.intro,{w:wName,c:cName,t1:t1,t2:t2}))+'</p>';
+  H+='<p class="astro-disc">'+esc(A.disclaimer)+'</p>';
+  H+=sec(A.hStrength,[W.f, C.t, combo]);
+  H+=sec(A.hAct,A.actGeneric);
+  H+=sec(A.hWatch,[W.wt, C.v]);
+  H+=secP(A.hLove,cap(W.l)+'.');
+  H+=secP(A.hWork,cap(W.w.join(' \u00b7 '))+'.');
+  H+=secP(A.hBest,cap(W.f)+'.');
+  H+=secP(A.hWorst,cap(C.v)+'.');
+  H+=secP(A.hSum,fill(A.sumTpl,{w:wName,c:cName,t1:t1,t2:t2,t3:t3,vice:C.v}));
+  var cel=ASTRO_CELEB[zi+'-'+ci];
+  if(cel&&cel.length)H+=secP(t('astroCeleb'),cel.join(' \u00b7 '));
+  return {title:wName+' '+wEmo+' + '+cName+' '+cEmo, html:H};
+}
+
 /* ===== Blocs enrichis : mesures, carte d'identité, surprise, blague ===== */
 function cnum(n){try{return new Intl.NumberFormat(loc(),{notation:'compact',maximumSignificantDigits:2}).format(n);}catch(e){return fmt(n);}}
 function seasonIdx(d){var m=d.getMonth()+1,dd=d.getDate();
@@ -914,8 +1228,9 @@ var S_EMO=['\ud83c\udf38','\u2600\ufe0f','\ud83c\udf42','\u2744\ufe0f'],
     Z_EMO=['\u2648','\u2649','\u264a','\u264b','\u264c','\u264d','\u264e','\u264f','\u2650','\u2651','\u2652','\u2653'],
     C_EMO=['\ud83d\udc2d','\ud83d\udc2e','\ud83d\udc2f','\ud83d\udc30','\ud83d\udc32','\ud83d\udc0d','\ud83d\udc34','\ud83d\udc10','\ud83d\udc35','\ud83d\udc14','\ud83d\udc36','\ud83d\udc37'],
     M_EMO=['\ud83c\udf11','\ud83c\udf12','\ud83c\udf13','\ud83c\udf14','\ud83c\udf15','\ud83c\udf16','\ud83c\udf17','\ud83c\udf18'];
-var jkN=0;
-function renderJoke(){var js=t('jokes')||[];if(!js.length)return;var base=dayOfYear(new Date());$('jk-txt').textContent=js[((base+jkN)%js.length+js.length)%js.length];}
+var astroOpen=false,astroZi=0,astroCi=0,calcType='naissance';
+function renderAstroCard(zi,ci){var card=document.querySelector('.astrocard');if(calcType!=='naissance'){if(card)card.style.display='none';return;}if(card)card.style.display='';astroZi=zi;astroCi=ci;var r=renderAstro(zi,ci);$('astro-title').textContent=r.title;$('astro-body').innerHTML=r.html;applyAstroClamp();}
+function applyAstroClamp(){var b=$('astro-body');if(astroOpen){b.classList.remove('clamped');$('astro-toggle').textContent=t('astroLess');}else{b.classList.add('clamped');$('astro-toggle').textContent=t('astroToggle');}}
 function lowSeason(sn){return L==='de'?sn:sn.toLocaleLowerCase(loc());}
 function renderExtras(dt,c){
   /* Mesures (masquées pour une date future) */
@@ -954,10 +1269,10 @@ function renderExtras(dt,c){
     .replace('{s0}',lowSeason(t('seasons')[si])+' '+S_EMO[si])
     .replace('{s1}',lowSeason(t('seasons')[s1])+' '+S_EMO[s1])
     .replace('{dow}',dw);
-  renderJoke();
+  renderAstroCard(zi,ci);
 }
-$('c-date').addEventListener('change',renderCalc);$('c-date').addEventListener('input',renderCalc);$('c-time').addEventListener('change',renderCalc);
-$('jk-refresh').addEventListener('click',()=>{jkN++;renderJoke();});
+$('c-date').addEventListener('change',function(){calcType='naissance';renderCalc();});$('c-date').addEventListener('input',function(){calcType='naissance';renderCalc();});$('c-time').addEventListener('change',renderCalc);
+$('astro-toggle').addEventListener('click',()=>{astroOpen=!astroOpen;applyAstroClamp();});
 
 /* nav + historique navigateur */
 function showView(v){['home','account','legal'].forEach(x=>$('view-'+x).classList.add('hidden'));$('view-'+v).classList.remove('hidden');window.scrollTo(0,0);}
@@ -1016,7 +1331,7 @@ function renderMyDates(){
   arr.forEach(p=>{const b=new Date(p.date_ref),c=counts(b,now);const el=document.createElement('div');el.className='item';
     el.innerHTML='<div class="ava">'+(TYPE_ICON[p.type]||'✦')+'</div><div style="min-width:0"><div class="it-name">'+esc(p.libelle)+'</div><div class="it-sub">'+fmtDate(b,{day:'numeric',month:'short',year:'numeric'})+'</div></div>'
       +'<div class="it-days"><b>'+fmt(c.jours)+'</b><span>'+t('daysWord')+'</span></div><div class="del-x" data-del="'+p.id+'">✕</div>';
-    el.addEventListener('click',e=>{if(e.target.getAttribute('data-del'))return;const bd=new Date(p.date_ref),pd=n=>('0'+n).slice(-2);$('c-date').value=bd.getFullYear()+'-'+pd(bd.getMonth()+1)+'-'+pd(bd.getDate());const hh=pd(bd.getHours())+':'+pd(bd.getMinutes());$('c-time').value=(hh!=='00:00')?hh:'';show('home');renderCalc();});
+    el.addEventListener('click',e=>{if(e.target.getAttribute('data-del'))return;const bd=new Date(p.date_ref),pd=n=>('0'+n).slice(-2);$('c-date').value=bd.getFullYear()+'-'+pd(bd.getMonth()+1)+'-'+pd(bd.getDate());const hh=pd(bd.getHours())+':'+pd(bd.getMinutes());$('c-time').value=(hh!=='00:00')?hh:'';calcType=p.type||'autre';show('home');renderCalc();});
     el.querySelector('[data-del]').addEventListener('click',e=>{e.stopPropagation();delDate(p.id,p.libelle);});
     list.appendChild(el);});
 }
